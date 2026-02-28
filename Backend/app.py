@@ -1,84 +1,90 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from pathlib import Path
 import pandas as pd
 import joblib
 
 from utils import prepare_features, generate_signal, THRESHOLD
 
+
+
 app = FastAPI(title="Stock Prediction API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# 🔹 Load models ONCE (important)
+
+BASE_DIR = Path(__file__).resolve().parent
+
+
+
 MODELS = {
-    "RELIANCE": joblib.load("../Models/reliance_model.pkl"),
-    "TCS": joblib.load("../Models/tcs_model.pkl"),
-    "ADANI": joblib.load("../Models/Adani_model.pkl"),
-    "GOLD": joblib.load("../Models/Gold_model.pkl"),
-    "SILVER": joblib.load("../Models/Silver_model.pkl"),
-    "SUZLON": joblib.load("../Models/Suzlon_model.pkl"),
+    "RELIANCE": joblib.load(BASE_DIR / "Models" / "reliance_model.pkl"),
+    "TCS": joblib.load(BASE_DIR / "Models" / "tcs_model.pkl"),
+    "ADANI": joblib.load(BASE_DIR / "Models" / "Adani_model.pkl"),
+    "GOLD": joblib.load(BASE_DIR / "Models" / "Gold_model.pkl"),
+    "SILVER": joblib.load(BASE_DIR / "Models" / "Silver_model.pkl"),
+    "SUZLON": joblib.load(BASE_DIR / "Models" / "Suzlon_model.pkl"),
 }
 
 DATA_FILES = {
-    "RELIANCE": "../data/RELIANCE_cleaned.csv",
-    "TCS": "../data/TCS.csv",
-    "ADANI": "../data/Adani.csv",
-    "GOLD": "../data/Gold.csv",
-    "SILVER": "../data/Silver.csv",
-    "SUZLON": "../data/Suzlon.csv",
+    "RELIANCE": BASE_DIR / "data" / "RELIANCE_cleaned.csv",
+    "TCS": BASE_DIR / "data" / "TCS.csv",
+    "ADANI": BASE_DIR / "data" / "Adani.csv",
+    "GOLD": BASE_DIR / "data" / "Gold.csv",
+    "SILVER": BASE_DIR / "data" / "Silver.csv",
+    "SUZLON": BASE_DIR / "data" / "Suzlon.csv",
 }
+
+
+
+class PredictRequest(BaseModel):
+    stock: str
+
+
 
 @app.get("/")
 def home():
     return {"message": "Stock Prediction API is running"}
 
-@app.get("/predict")
-def predict(stock: str):
-    stock = stock.upper()
+@app.post("/predict")
+def predict(req: PredictRequest):
+    stock = req.stock.upper()
 
     if stock not in MODELS:
         raise HTTPException(status_code=404, detail="Stock not supported")
 
-    # Load latest data
     df = pd.read_csv(DATA_FILES[stock])
     df["Date"] = pd.to_datetime(df["Date"])
     df = df.sort_values("Date")
 
-    # Get model object
     obj = MODELS[stock]
     model = obj
-    
-    # Handle cases where model might be in a dictionary
+
     if isinstance(obj, dict):
         for v in obj.values():
             if hasattr(v, "predict"):
                 model = v
                 break
 
-    # Detect required feature count
     n_features = getattr(model, "n_features_in_", 4)
 
-    # Prepare features
     X_tomorrow = prepare_features(df, n_features=n_features)
 
-    # Predict
     raw_prediction = float(model.predict(X_tomorrow)[0])
     current_price = float(df["Close"].iloc[-1])
-    
-    # Normalize: If raw prediction is > 1.0, assume it's an absolute price target
-    # and convert to a fractional return. (e.g. 1% return = 0.01)
-    if abs(raw_prediction) > 2.0: # threshold to distinguish return vs price
+
+    if abs(raw_prediction) > 2.0:
         predicted_return = (raw_prediction - current_price) / current_price
     else:
         predicted_return = raw_prediction
 
-    # Signal logic
     signal = generate_signal(predicted_return)
 
     return {
