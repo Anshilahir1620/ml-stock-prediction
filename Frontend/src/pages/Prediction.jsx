@@ -250,15 +250,15 @@ const Prediction = () => {
                         </h1>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                    <div className="flex flex-col lg:flex-row items-center gap-4 w-full lg:w-auto mb-4 md:mb-0">
                         {/* REFINED DROPDOWN */}
-                        <div className="relative w-full sm:w-80 md:w-auto gsap-hero-el" ref={dropdownRef} style={{ zIndex: isDropdownOpen ? 200 : 40 }}>
+                        <div className="relative w-full lg:w-[320px] gsap-hero-el" ref={dropdownRef} style={{ zIndex: isDropdownOpen ? 200 : 40 }}>
                             <motion.button
                                 whileHover={{ y: -2 }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                                 disabled={stocksLoading}
-                                className={`group relative w-full bg-white backdrop-blur-xl border ${isDropdownOpen ? 'border-slate-900 shadow-xl' : 'border-slate-200/80'} px-6 py-4 rounded-[1.8rem] flex items-center gap-4 min-w-full md:min-w-[300px] transition-all duration-500 disabled:opacity-50 overflow-hidden shadow-sm h-[72px] md:h-auto`}
+                                className={`group relative w-full bg-white backdrop-blur-xl border ${isDropdownOpen ? 'border-slate-900 shadow-xl' : 'border-slate-200/80'} px-6 py-4 rounded-[1.8rem] flex items-center gap-4 transition-all duration-500 disabled:opacity-50 overflow-hidden shadow-sm h-[72px]`}
                             >
                                 {/* SUBTLE GLOW OVERLAY */}
                                 <div className="absolute inset-0 bg-gradient-to-tr from-slate-50/0 via-slate-50/5 to-white/30 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -271,7 +271,7 @@ const Prediction = () => {
                                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none mb-2 opacity-80 truncate">
                                         {stocksLoading ? 'Neural Engine' : (stock ? 'Asset Selected' : 'Search Trace')}
                                     </p>
-                                    <span className="text-[17px] font-black text-slate-900 leading-none tracking-tight block truncate uppercase">
+                                    <span className="text-[16px] font-black text-slate-900 leading-none tracking-tight block truncate uppercase">
                                         {stocksLoading ? 'Scanning Node...' : (stock ? `${stock}.NSE` : 'Select Asset')}
                                     </span>
                                 </div>
@@ -331,7 +331,7 @@ const Prediction = () => {
                             onMouseEnter={(e) => gsap.to(e.currentTarget, { scale: 1.02, duration: 0.3 })}
                             onMouseLeave={(e) => gsap.to(e.currentTarget, { scale: 1, duration: 0.3 })}
                             disabled={loading || !stock}
-                            className="relative z-30 w-full sm:w-auto bg-slate-900 text-white px-8 py-4 md:py-3.5 rounded-[1.8rem] font-black text-[11px] md:text-[12px] uppercase tracking-[0.2em] flex items-center justify-center gap-3 transition-all hover:bg-black disabled:opacity-40 shadow-xl shadow-slate-200/50 gsap-hero-el h-[72px] md:h-auto border border-white/10"
+                            className={`relative z-30 w-full lg:w-auto px-10 py-4 h-[72px] rounded-[1.8rem] font-black text-[11px] md:text-[12px] uppercase tracking-[0.2em] flex items-center justify-center gap-3 transition-all gsap-hero-el border ${loading || !stock ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed opacity-80' : 'bg-slate-900 text-white border-white/10 hover:bg-black shadow-xl shadow-slate-200/50'}`}
                         >
                             <RefreshCcw size={18} className={loading ? 'animate-spin' : ''} />
                             {loading ? 'Processing Node...' : 'Execute Analysis'}
@@ -618,7 +618,7 @@ const Prediction = () => {
                     background: #e2e8f0;
                 }
             `}} />
-        </div>
+        </div >
     );
 };
 

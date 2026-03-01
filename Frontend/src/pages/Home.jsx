@@ -228,13 +228,13 @@ const Home = () => {
                         { val: "2+", label: "ML MODELS", color: "text-orange-500", desc: "Recursive evaluation of Logistic Regression and Random Forest clusters." }
                     ].map((m, i) => (
                         <div key={i} className="text-center group flex flex-col items-center">
-                            <div className="overflow-hidden mb-4 md:mb-6">
-                                <p className={`stat-num text-5xl sm:text-6xl md:text-[100px] font-black leading-tight md:leading-none ${m.color} tracking-tighter group-hover:scale-105 transition-transform duration-500`}>
+                            <div className="mb-4 md:mb-6">
+                                <p className={`stat-num text-6xl md:text-[110px] font-black leading-[1.2] md:leading-none ${m.color} tracking-tighter group-hover:scale-105 transition-transform duration-500`}>
                                     {m.val}
                                 </p>
                             </div>
-                            <h4 className="text-[10px] md:text-[13px] font-black text-gray-400 uppercase tracking-[0.3em] md:tracking-[0.4em] mb-4 md:mb-8">{m.label}</h4>
-                            <p className="text-[12px] md:text-[14px] text-gray-400 font-bold uppercase tracking-tight leading-relaxed max-w-[260px] mx-auto opacity-70 px-2 lg:px-4">
+                            <h4 className="text-[10px] md:text-[13px] font-black text-gray-400 uppercase tracking-[0.4em] mb-4 md:mb-8">{m.label}</h4>
+                            <p className="text-[12px] md:text-[14px] text-gray-400 font-bold uppercase tracking-tight leading-relaxed max-w-[260px] mx-auto opacity-70 px-4">
                                 {m.desc}
                             </p>
                         </div>
