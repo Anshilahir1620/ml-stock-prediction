@@ -225,7 +225,7 @@ const Prediction = () => {
     };
 
     return (
-        <div ref={containerRef} className="w-full pt-10 pb-32 px-4 md:px-12 lg:px-24 bg-[#FCFCFD] overflow-x-hidden relative min-h-screen">
+        <div ref={containerRef} className="w-full pt-10 pb-10 px-4 md:px-12 lg:px-24 bg-[#FCFCFD] overflow-x-hidden relative min-h-screen">
             {/* FINE SUBTLE GRID */}
             <div className="system-grid absolute inset-0 opacity-[0.03] pointer-events-none -z-10"
                 style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
@@ -252,73 +252,72 @@ const Prediction = () => {
 
                     <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
                         {/* REFINED DROPDOWN */}
-                        <div className="relative w-full sm:w-80 md:w-auto gsap-hero-el" ref={dropdownRef}>
+                        <div className="relative w-full sm:w-80 md:w-auto gsap-hero-el" ref={dropdownRef} style={{ zIndex: isDropdownOpen ? 200 : 40 }}>
                             <motion.button
                                 whileHover={{ y: -2 }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                                 disabled={stocksLoading}
-                                className={`group relative w-full bg-white/80 backdrop-blur-xl border ${isDropdownOpen ? 'border-slate-900/10 shadow-inner' : 'border-slate-200/60'} px-6 py-4 rounded-[1.5rem] flex items-center gap-4 min-w-full md:min-w-[280px] transition-all duration-500 disabled:opacity-50 overflow-hidden shadow-sm`}
+                                className={`group relative w-full bg-white backdrop-blur-xl border ${isDropdownOpen ? 'border-slate-900 shadow-xl' : 'border-slate-200/80'} px-6 py-4 rounded-[1.8rem] flex items-center gap-4 min-w-full md:min-w-[300px] transition-all duration-500 disabled:opacity-50 overflow-hidden shadow-sm h-[72px] md:h-auto`}
                             >
-                                {/* ANIMATED BORDER HIGHLIGHT (BEAM EFFECT) */}
-                                <div className="absolute inset-0 rounded-[1.5rem] pointer-events-none overflow-hidden">
-                                    <motion.div
-                                        animate={{ rotate: [0, 360] }}
-                                        transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                                        className="absolute -inset-[150%] bg-[conic-gradient(from_0deg,transparent_0deg,transparent_280deg,#94a3b8_360deg)] opacity-0 group-hover:opacity-40 transition-opacity duration-700"
-                                    />
-                                </div>
-
                                 {/* SUBTLE GLOW OVERLAY */}
-                                <div className="absolute inset-0 bg-gradient-to-tr from-slate-100/0 via-slate-100/5 to-white/30 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                <div className="absolute inset-0 bg-gradient-to-tr from-slate-50/0 via-slate-50/5 to-white/30 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                                <div className={`p-2.5 rounded-xl transition-all duration-500 shrink-0 ${isDropdownOpen ? 'bg-slate-900 text-white scale-110 shadow-lg' : 'bg-slate-50 text-slate-400 group-hover:bg-white group-hover:text-slate-600'}`}>
-                                    <BarChart3 size={18} className={stocksLoading ? 'animate-pulse' : ''} />
+                                <div className={`p-3 rounded-2xl transition-all duration-500 shrink-0 ${isDropdownOpen ? 'bg-slate-900 text-white shadow-[0_8px_20px_rgba(0,0,0,0.15)]' : 'bg-slate-50 text-slate-400 group-hover:bg-slate-100 group-hover:text-slate-600'}`}>
+                                    <BarChart3 size={20} className={stocksLoading ? 'animate-pulse' : ''} />
                                 </div>
 
                                 <div className="flex-1 text-left relative z-10 overflow-hidden">
-                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none mb-1.5 opacity-70 group-hover:opacity-100 transition-opacity truncate">
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none mb-2 opacity-80 truncate">
                                         {stocksLoading ? 'Neural Engine' : (stock ? 'Asset Selected' : 'Search Trace')}
                                     </p>
-                                    <span className="text-[15px] font-extrabold text-slate-900 leading-none tracking-tight block truncate uppercase">
-                                        {stocksLoading ? (
-                                            <span className="flex items-center gap-2">
-                                                Scanning <span className="flex gap-0.5"><span className="w-1 h-1 bg-slate-400 rounded-full animate-bounce" /><span className="w-1 h-1 bg-slate-400 rounded-full animate-bounce [animation-delay:0.2s]" /><span className="w-1 h-1 bg-slate-400 rounded-full animate-bounce [animation-delay:0.4s]" /></span>
-                                            </span>
-                                        ) : (stock ? `${stock}.NSE` : 'Select Asset')}
+                                    <span className="text-[17px] font-black text-slate-900 leading-none tracking-tight block truncate uppercase">
+                                        {stocksLoading ? 'Scanning Node...' : (stock ? `${stock}.NSE` : 'Select Asset')}
                                     </span>
                                 </div>
 
                                 <ChevronDown
-                                    size={14}
-                                    className={`text-slate-300 transition-all duration-500 transform ${isDropdownOpen ? 'rotate-180 text-slate-900 scale-125' : 'group-hover:text-slate-500'}`}
+                                    size={16}
+                                    className={`text-slate-300 transition-all duration-500 transform ${isDropdownOpen ? 'rotate-180 text-slate-900' : 'group-hover:text-slate-500'}`}
                                 />
                             </motion.button>
 
                             <AnimatePresence>
                                 {isDropdownOpen && (
                                     <motion.div
-                                        initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                                        initial={{ opacity: 0, y: 15, scale: 0.95 }}
                                         animate={{ opacity: 1, y: 0, scale: 1 }}
-                                        exit={{ opacity: 0, y: 5, scale: 0.98 }}
-                                        transition={{ duration: 0.2, ease: "power2.out" }}
-                                        className="absolute top-full left-0 right-0 mt-3 bg-white border border-slate-100 rounded-[2rem] shadow-[0_30px_60px_rgba(0,0,0,0.12)] z-[100] overflow-hidden py-3"
+                                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                        transition={{ duration: 0.3, ease: "easeOut" }}
+                                        className="absolute top-full left-0 right-0 mt-4 bg-white border border-slate-100 rounded-[2.5rem] shadow-[0_40px_80px_-15px_rgba(0,0,0,0.15)] z-[200] overflow-hidden py-4"
                                     >
-                                        <div className="px-6 py-3 border-b border-slate-50 mb-1">
-                                            <p className="text-[10px] font-bold text-slate-300 uppercase tracking-[0.2em]">Available Assets</p>
+                                        <div className="px-8 py-4 border-b border-slate-50 mb-2">
+                                            <p className="text-[11px] font-black text-slate-300 uppercase tracking-[0.3em] flex items-center gap-2">
+                                                <div className="w-1 h-1 bg-slate-200 rounded-full" />
+                                                Available Assets
+                                            </p>
                                         </div>
-                                        <div className="max-h-[300px] overflow-y-auto px-2 custom-scrollbar">
+                                        <div className="max-h-[350px] overflow-y-auto px-3 custom-scrollbar">
                                             {supportedStocks.map((ticker) => (
                                                 <button
                                                     key={ticker}
                                                     onClick={() => selectStock(ticker)}
-                                                    className={`w-full px-5 py-3.5 flex items-center gap-4 transition-all rounded-2xl hover:bg-slate-50 ${stock === ticker ? 'bg-slate-50/50' : ''}`}
+                                                    className={`w-full px-5 py-4 flex items-center gap-5 transition-all rounded-[1.5rem] hover:bg-slate-50 group/item ${stock === ticker ? 'bg-slate-50/70 border border-slate-100/50 shadow-sm' : 'border border-transparent'}`}
                                                 >
-                                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-[11px] font-bold ${stock === ticker ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                                                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-[12px] font-black transition-all duration-300 ${stock === ticker ? 'bg-slate-900 text-white shadow-lg' : 'bg-slate-50 text-slate-400 group-hover/item:scale-110 group-hover/item:bg-white group-hover/item:shadow-md'}`}>
                                                         {ticker.slice(0, 2)}
                                                     </div>
-                                                    <span className="text-[14px] font-bold text-slate-700">{ticker}</span>
-                                                    {stock === ticker && <div className="ml-auto w-1.5 h-1.5 bg-emerald-500 rounded-full" />}
+                                                    <div className="flex flex-col text-left">
+                                                        <span className={`text-[15px] font-bold ${stock === ticker ? 'text-slate-900' : 'text-slate-600 group-hover/item:text-slate-900'}`}>
+                                                            {ticker}
+                                                        </span>
+                                                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">National Stock Exchange</span>
+                                                    </div>
+                                                    {stock === ticker && (
+                                                        <div className="ml-auto flex items-center gap-2">
+                                                            <div className="w-2 h-2 bg-emerald-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+                                                        </div>
+                                                    )}
                                                 </button>
                                             ))}
                                         </div>
@@ -332,10 +331,10 @@ const Prediction = () => {
                             onMouseEnter={(e) => gsap.to(e.currentTarget, { scale: 1.02, duration: 0.3 })}
                             onMouseLeave={(e) => gsap.to(e.currentTarget, { scale: 1, duration: 0.3 })}
                             disabled={loading || !stock}
-                            className="w-full sm:w-auto bg-slate-900 text-white px-8 py-4 md:py-3.5 rounded-2xl font-bold text-[12px] uppercase tracking-[0.15em] flex items-center justify-center gap-3 transition-colors hover:bg-black disabled:opacity-50 shadow-lg shadow-slate-200 gsap-hero-el h-[68px] md:h-auto"
+                            className="relative z-30 w-full sm:w-auto bg-slate-900 text-white px-8 py-4 md:py-3.5 rounded-[1.8rem] font-black text-[11px] md:text-[12px] uppercase tracking-[0.2em] flex items-center justify-center gap-3 transition-all hover:bg-black disabled:opacity-40 shadow-xl shadow-slate-200/50 gsap-hero-el h-[72px] md:h-auto border border-white/10"
                         >
-                            <RefreshCcw size={16} className={loading ? 'animate-spin' : ''} />
-                            {loading ? 'Processing...' : 'Execute Analysis'}
+                            <RefreshCcw size={18} className={loading ? 'animate-spin' : ''} />
+                            {loading ? 'Processing Node...' : 'Execute Analysis'}
                         </button>
                     </div>
                 </header>

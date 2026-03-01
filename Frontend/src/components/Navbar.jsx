@@ -89,19 +89,19 @@ const Navbar = () => {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                        className="fixed inset-0 bg-[#0a0a0a] z-[9999] md:hidden flex flex-col items-center justify-center px-8 overflow-hidden"
+                        className="fixed inset-0 bg-[#0a0a0a] z-[9999] md:hidden overflow-y-auto"
                         style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh' }}
                     >
                         {/* THE GRID Background Overlay */}
-                        <div className="absolute inset-0 opacity-[0.05] pointer-events-none"
+                        <div className="fixed inset-0 opacity-[0.05] pointer-events-none"
                             style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
 
                         {/* Soft Glow Accents */}
-                        <div className="absolute top-[-20%] right-[-20%] w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[120px]" />
-                        <div className="absolute bottom-[-20%] left-[-20%] w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-[140px]" />
+                        <div className="fixed top-[-20%] right-[-20%] w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[120px]" />
+                        <div className="fixed bottom-[-20%] left-[-20%] w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-[140px]" />
 
-                        {/* Top Header Section inside Overlay */}
-                        <div className="absolute top-0 left-0 right-0 p-8 flex justify-between items-center w-full z-[10000]">
+                        {/* Top Header Section (Fixed inside Scrollable Overlay) */}
+                        <div className="sticky top-0 left-0 right-0 p-8 flex justify-between items-center w-full z-[10000] bg-[#0a0a0a]/80 backdrop-blur-md">
                             <div className="flex items-center gap-3">
                                 <div className="bg-emerald-500 p-1.5 rounded-lg shadow-[0_0_20px_rgba(16,185,129,0.3)]">
                                     <TrendingUp size={20} className="text-white" />
@@ -109,7 +109,6 @@ const Navbar = () => {
                                 <span className="text-white font-black uppercase tracking-tighter text-sm">Stockton Navigation</span>
                             </div>
 
-                            {/* Clear Close X Button */}
                             <button
                                 onClick={() => setIsOpen(false)}
                                 className="w-14 h-14 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-white transition-all active:scale-90 hover:bg-white/10"
@@ -119,72 +118,75 @@ const Navbar = () => {
                             </button>
                         </div>
 
-                        {/* Centered Navigation Links */}
-                        <div className="relative z-[50] flex flex-col gap-4 w-full max-w-sm mt-8">
-                            <p className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.8em] text-center mb-8 opacity-40 italic">System Directory</p>
+                        {/* Centered Navigation Links with Scroll Padding */}
+                        <div className="relative z-[50] flex flex-col items-center px-8 pt-8 pb-32 min-h-[calc(100vh-100px)]">
+                            <div className="w-full max-w-sm flex flex-col gap-4 mt-8">
+                                <p className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.8em] text-center mb-8 opacity-40 italic">System Directory</p>
 
-                            {navItems.map((item, idx) => {
-                                const isExternal = item.isExternal;
-                                const isActive = !isExternal && location.pathname === item.path;
+                                {navItems.map((item, idx) => {
+                                    const isExternal = item.isExternal;
+                                    const isActive = !isExternal && location.pathname === item.path;
 
-                                return (
-                                    <motion.div
-                                        key={`${item.name}-${idx}`}
-                                        initial={{ opacity: 0, y: 30 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: 0.1 + idx * 0.07, ease: [0.22, 1, 0.36, 1] }}
-                                    >
-                                        {isExternal ? (
-                                            <a
-                                                href={item.path}
-                                                className="flex items-center gap-6 py-4 px-7 rounded-[2rem] transition-all duration-500 group relative border border-white/0 hover:border-white/10 hover:bg-white/5"
-                                            >
-                                                <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-gray-500 group-hover:text-white transition-colors duration-500">
-                                                    {item.icon}
-                                                </div>
-                                                <div className="flex flex-col text-left">
-                                                    <span className="text-[24px] font-black uppercase tracking-tight text-gray-400 group-hover:text-white transition-colors duration-500">
-                                                        {item.name}
-                                                    </span>
-                                                    <span className="text-[9px] font-bold text-gray-600 uppercase tracking-[0.3em] mt-1">
-                                                        Outgoing Link
-                                                    </span>
-                                                </div>
-                                            </a>
-                                        ) : (
-                                            <NavLink
-                                                to={item.path}
-                                                onClick={() => setIsOpen(false)}
-                                                className={({ isActive }) =>
-                                                    `flex items-center gap-6 py-4 px-7 rounded-[2rem] transition-all duration-500 group relative border ${isActive ? 'bg-white/5 border-white/10' : 'border-white/0 hover:border-white/10 hover:bg-white/5'}`
-                                                }
-                                            >
-                                                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 ${isActive ? 'bg-emerald-500 text-white shadow-[0_0_30px_rgba(16,185,129,0.4)]' : 'bg-white/5 text-gray-400 group-hover:text-white'}`}>
-                                                    {item.icon}
-                                                </div>
-                                                <div className="flex flex-col text-left">
-                                                    <span className={`text-[24px] font-black uppercase tracking-tight ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-white'}`}>
-                                                        {item.name}
-                                                    </span>
-                                                    <span className="text-[9px] font-bold text-gray-600 uppercase tracking-[0.3em] mt-1">
-                                                        {isActive ? 'Current Node' : 'Initialize Session'}
-                                                    </span>
-                                                </div>
-                                                {isActive && (
-                                                    <ArrowRight size={20} className="ml-auto text-emerald-500" />
-                                                )}
-                                            </NavLink>
-                                        )}
-                                    </motion.div>
-                                );
-                            })}
-                        </div>
+                                    return (
+                                        <motion.div
+                                            key={`${item.name}-${idx}`}
+                                            initial={{ opacity: 0, y: 30 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: 0.1 + idx * 0.07, ease: [0.22, 1, 0.36, 1] }}
+                                        >
+                                            {isExternal ? (
+                                                <a
+                                                    href={item.path}
+                                                    className="flex items-center gap-6 py-4 px-7 rounded-[2rem] transition-all duration-500 group relative border border-white/0 hover:border-white/10 hover:bg-white/5"
+                                                >
+                                                    <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-gray-500 group-hover:text-white transition-colors duration-500">
+                                                        {item.icon}
+                                                    </div>
+                                                    <div className="flex flex-col text-left">
+                                                        <span className="text-[24px] font-black uppercase tracking-tight text-gray-400 group-hover:text-white transition-colors duration-500">
+                                                            {item.name}
+                                                        </span>
+                                                        <span className="text-[9px] font-bold text-gray-600 uppercase tracking-[0.3em] mt-1">
+                                                            Outgoing Link
+                                                        </span>
+                                                    </div>
+                                                </a>
+                                            ) : (
+                                                <NavLink
+                                                    to={item.path}
+                                                    onClick={() => setIsOpen(false)}
+                                                    className={({ isActive }) =>
+                                                        `flex items-center gap-6 py-4 px-7 rounded-[2rem] transition-all duration-500 group relative border ${isActive ? 'bg-white/5 border-white/10' : 'border-white/0 hover:border-white/10 hover:bg-white/5'}`
+                                                    }
+                                                >
+                                                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 ${isActive ? 'bg-emerald-500 text-white shadow-[0_0_30px_rgba(16,185,129,0.4)]' : 'bg-white/5 text-gray-400 group-hover:text-white'}`}>
+                                                        {item.icon}
+                                                    </div>
+                                                    <div className="flex flex-col text-left">
+                                                        <span className={`text-[24px] font-black uppercase tracking-tight ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-white'}`}>
+                                                            {item.name}
+                                                        </span>
+                                                        <span className="text-[9px] font-bold text-gray-600 uppercase tracking-[0.3em] mt-1">
+                                                            {isActive ? 'Current Node' : 'Initialize Session'}
+                                                        </span>
+                                                    </div>
+                                                    {isActive && (
+                                                        <ArrowRight size={20} className="ml-auto text-emerald-500" />
+                                                    )}
+                                                </NavLink>
+                                            )}
+                                        </motion.div>
+                                    );
+                                })}
+                            </div>
 
-                        {/* Bottom Status Info */}
-                        <div className="absolute bottom-12 text-center w-full flex flex-col items-center gap-6">
-                            <div className="flex items-center gap-4 bg-emerald-500/10 px-6 py-3 rounded-full border border-emerald-500/20">
-                                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                                <span className="text-[9px] font-bold text-emerald-400 uppercase tracking-[0.5em]">System: Operational.Hub v4.2</span>
+                            {/* Bottom Status Info */}
+                            <div className="text-center w-full flex flex-col items-center gap-6 mt-16 pb-12">
+                                <div className="h-[1px] w-24 bg-white/10" />
+                                <div className="flex items-center gap-4 bg-emerald-500/10 px-6 py-3 rounded-full border border-emerald-500/20">
+                                    <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                                    <span className="text-[9px] font-bold text-emerald-400 uppercase tracking-[0.5em]">System: Operational.Hub v4.2</span>
+                                </div>
                             </div>
                         </div>
                     </motion.div>
