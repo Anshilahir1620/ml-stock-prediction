@@ -237,28 +237,28 @@ const Prediction = () => {
             <div className="max-w-[1300px] mx-auto relative z-10 w-full">
 
                 {/* ───────── HEADER (REFINED HERO) ───────── */}
-                <header ref={heroRef} className="relative z-50 mb-14 flex flex-col md:flex-row md:items-end justify-between gap-10">
-                    <div>
-                        <div className="gsap-hero-el flex items-center gap-2 mb-4">
+                <header ref={heroRef} className="relative z-50 mb-10 md:mb-14 flex flex-col md:flex-row md:items-end justify-between gap-8 md:gap-10">
+                    <div className="text-center md:text-left">
+                        <div className="gsap-hero-el flex items-center justify-center md:justify-start gap-2 mb-4">
                             <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">
+                            <span className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">
                                 Terminal Active — Node 16.2
                             </span>
                         </div>
                         <h1 className="gsap-hero-el text-4xl lg:text-[52px] font-bold text-slate-900 tracking-tight leading-[1.05]">
-                            Market <span className="text-slate-400">Intelligence.</span>
+                            Market <span className="text-slate-400 font-medium">Intelligence.</span>
                         </h1>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row items-center gap-4">
+                    <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
                         {/* REFINED DROPDOWN */}
-                        <div className="relative w-full sm:w-auto gsap-hero-el" ref={dropdownRef}>
+                        <div className="relative w-full sm:w-80 md:w-auto gsap-hero-el" ref={dropdownRef}>
                             <motion.button
-                                whileHover={{ y: -2, boxShadow: '0 20px 40px -15px rgba(0,0,0,0.06)' }}
+                                whileHover={{ y: -2 }}
                                 whileTap={{ scale: 0.98 }}
                                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                                 disabled={stocksLoading}
-                                className={`group relative bg-white/80 backdrop-blur-xl border ${isDropdownOpen ? 'border-slate-900/10 shadow-inner' : 'border-slate-200/60'} px-6 py-4 rounded-[1.5rem] flex items-center gap-4 min-w-[280px] transition-all duration-500 disabled:opacity-50 overflow-hidden`}
+                                className={`group relative w-full bg-white/80 backdrop-blur-xl border ${isDropdownOpen ? 'border-slate-900/10 shadow-inner' : 'border-slate-200/60'} px-6 py-4 rounded-[1.5rem] flex items-center gap-4 min-w-full md:min-w-[280px] transition-all duration-500 disabled:opacity-50 overflow-hidden shadow-sm`}
                             >
                                 {/* ANIMATED BORDER HIGHLIGHT (BEAM EFFECT) */}
                                 <div className="absolute inset-0 rounded-[1.5rem] pointer-events-none overflow-hidden">
@@ -272,20 +272,20 @@ const Prediction = () => {
                                 {/* SUBTLE GLOW OVERLAY */}
                                 <div className="absolute inset-0 bg-gradient-to-tr from-slate-100/0 via-slate-100/5 to-white/30 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                                <div className={`p-2.5 rounded-xl transition-all duration-500 ${isDropdownOpen ? 'bg-slate-900 text-white scale-110 shadow-lg' : 'bg-slate-50 text-slate-400 group-hover:bg-white group-hover:text-slate-600'}`}>
+                                <div className={`p-2.5 rounded-xl transition-all duration-500 shrink-0 ${isDropdownOpen ? 'bg-slate-900 text-white scale-110 shadow-lg' : 'bg-slate-50 text-slate-400 group-hover:bg-white group-hover:text-slate-600'}`}>
                                     <BarChart3 size={18} className={stocksLoading ? 'animate-pulse' : ''} />
                                 </div>
 
-                                <div className="flex-1 text-left relative z-10">
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] leading-none mb-1.5 opacity-70 group-hover:opacity-100 transition-opacity">
-                                        {stocksLoading ? 'Neural Engine' : 'Asset Trace'}
+                                <div className="flex-1 text-left relative z-10 overflow-hidden">
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none mb-1.5 opacity-70 group-hover:opacity-100 transition-opacity truncate">
+                                        {stocksLoading ? 'Neural Engine' : (stock ? 'Asset Selected' : 'Search Trace')}
                                     </p>
-                                    <span className="text-[15px] font-extrabold text-slate-900 leading-none tracking-tight block">
+                                    <span className="text-[15px] font-extrabold text-slate-900 leading-none tracking-tight block truncate uppercase">
                                         {stocksLoading ? (
                                             <span className="flex items-center gap-2">
-                                                Scanning <span className="flex gap-0.5"><span className="w-1 h-1 bg-slate-300 rounded-full animate-bounce" /><span className="w-1 h-1 bg-slate-300 rounded-full animate-bounce [animation-delay:0.2s]" /><span className="w-1 h-1 bg-slate-300 rounded-full animate-bounce [animation-delay:0.4s]" /></span>
+                                                Scanning <span className="flex gap-0.5"><span className="w-1 h-1 bg-slate-400 rounded-full animate-bounce" /><span className="w-1 h-1 bg-slate-400 rounded-full animate-bounce [animation-delay:0.2s]" /><span className="w-1 h-1 bg-slate-400 rounded-full animate-bounce [animation-delay:0.4s]" /></span>
                                             </span>
-                                        ) : (stock ? `${stock}.NSE` : 'Select Ticker')}
+                                        ) : (stock ? `${stock}.NSE` : 'Select Asset')}
                                     </span>
                                 </div>
 
@@ -302,7 +302,7 @@ const Prediction = () => {
                                         animate={{ opacity: 1, y: 0, scale: 1 }}
                                         exit={{ opacity: 0, y: 5, scale: 0.98 }}
                                         transition={{ duration: 0.2, ease: "power2.out" }}
-                                        className="absolute top-full right-0 mt-3 w-full bg-white border border-slate-100 rounded-[2rem] shadow-[0_30px_60px_rgba(0,0,0,0.12)] z-[100] overflow-hidden py-3"
+                                        className="absolute top-full left-0 right-0 mt-3 bg-white border border-slate-100 rounded-[2rem] shadow-[0_30px_60px_rgba(0,0,0,0.12)] z-[100] overflow-hidden py-3"
                                     >
                                         <div className="px-6 py-3 border-b border-slate-50 mb-1">
                                             <p className="text-[10px] font-bold text-slate-300 uppercase tracking-[0.2em]">Available Assets</p>
@@ -332,7 +332,7 @@ const Prediction = () => {
                             onMouseEnter={(e) => gsap.to(e.currentTarget, { scale: 1.02, duration: 0.3 })}
                             onMouseLeave={(e) => gsap.to(e.currentTarget, { scale: 1, duration: 0.3 })}
                             disabled={loading || !stock}
-                            className="bg-slate-900 text-white px-8 py-3.5 rounded-2xl font-bold text-[12px] uppercase tracking-[0.15em] flex items-center gap-3 transition-colors hover:bg-black disabled:opacity-50 shadow-lg shadow-slate-200 gsap-hero-el"
+                            className="w-full sm:w-auto bg-slate-900 text-white px-8 py-4 md:py-3.5 rounded-2xl font-bold text-[12px] uppercase tracking-[0.15em] flex items-center justify-center gap-3 transition-colors hover:bg-black disabled:opacity-50 shadow-lg shadow-slate-200 gsap-hero-el h-[68px] md:h-auto"
                         >
                             <RefreshCcw size={16} className={loading ? 'animate-spin' : ''} />
                             {loading ? 'Processing...' : 'Execute Analysis'}
@@ -408,26 +408,26 @@ const Prediction = () => {
                                         </h2>
                                         <p className="text-[12px] font-medium text-slate-400 uppercase tracking-widest mb-10">Equilibrium Status</p>
 
-                                        <div className="mt-auto grid grid-cols-2 gap-6 pt-8 border-t border-slate-50">
+                                        <div className="mt-auto grid grid-cols-2 gap-4 md:gap-6 pt-8 border-t border-slate-50">
                                             <div>
-                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Alpha Projection</p>
-                                                <p className={`text-2xl font-bold ${result.predicted_return >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                                                <p className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Alpha Projection</p>
+                                                <p className={`text-xl md:text-2xl font-bold ${result.predicted_return >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
                                                     {result.predicted_return >= 0 ? '+' : ''}{(result.predicted_return * 100).toFixed(2)}%
                                                 </p>
                                             </div>
                                             <div>
-                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Cluster Confidence</p>
-                                                <p className="text-2xl font-bold text-slate-700">±{(result.threshold * 100).toFixed(1)}%</p>
+                                                <p className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Cluster Confidence</p>
+                                                <p className="text-xl md:text-2xl font-bold text-slate-700">±{(result.threshold * 100).toFixed(1)}%</p>
                                             </div>
                                         </div>
                                     </motion.div>
                                 ) : (
-                                    <div className="flex-1 flex flex-col items-center justify-center text-center px-6 py-10">
-                                        <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-200 mb-6">
+                                    <div className="flex-1 flex flex-col items-center justify-center text-center px-4 md:px-6 py-10">
+                                        <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-200 mb-6 font-black uppercase">
                                             <Target size={28} />
                                         </div>
-                                        <h4 className="text-lg font-bold text-slate-800 mb-2">Standby Mode</h4>
-                                        <p className="text-[13px] text-slate-400 leading-relaxed font-medium">Select a market listing to initiate neural synthesis and risk analysis.</p>
+                                        <h4 className="text-lg font-black text-slate-800 mb-2 uppercase tracking-tighter">Standby</h4>
+                                        <p className="text-[12px] md:text-[13px] text-slate-400 leading-relaxed font-bold uppercase tracking-tight">Select a market listing to initiate neural synthesis.</p>
                                     </div>
                                 )}
                             </AnimatePresence>
@@ -437,13 +437,13 @@ const Prediction = () => {
                             <div className="absolute top-0 right-0 p-8 opacity-10">
                                 <Cpu size={80} />
                             </div>
-                            <div className="relative z-10">
-                                <div className="flex items-center gap-2 mb-4">
+                            <div className="relative z-10 text-center md:text-left">
+                                <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
                                     <Zap size={14} className="text-amber-400" />
                                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Model Context</span>
                                 </div>
-                                <p className="text-[14px] text-slate-300 leading-relaxed font-medium">
-                                    Estimation uses <span className="text-white font-bold">recursive ensemble loops</span> to map price velocity against historical volatility clusters.
+                                <p className="text-[14px] text-slate-300 leading-relaxed font-bold uppercase tracking-tighter">
+                                    Estimation uses <span className="text-white font-black">recursive ensemble loops</span> to map price velocity against historical volatility clusters.
                                 </p>
                             </div>
                         </div>

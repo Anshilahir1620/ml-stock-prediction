@@ -26,31 +26,31 @@ const Footer = () => {
     }, []);
 
     return (
-        <footer ref={footerRef} className="w-full bg-white border-t border-gray-100 py-24 px-6 md:px-24 rounded-t-[5rem] shadow-[0_-30px_100px_rgba(0,0,0,0.03)] relative z-50">
+        <footer ref={footerRef} className="w-full bg-white border-t border-gray-100 py-16 md:py-24 px-6 md:px-24 rounded-t-[3rem] md:rounded-t-[5rem] shadow-[0_-30px_100px_rgba(0,0,0,0.03)] relative z-50">
             <div className="max-w-7xl mx-auto footer-reveal">
                 <div className="flex flex-col md:flex-row justify-between items-start gap-12 mb-20">
                     {/* Left Column: Project Info */}
-                    <div className="max-w-md">
-                        <div className="flex items-center gap-3 mb-6">
+                    <div className="max-w-md w-full text-center md:text-left">
+                        <div className="flex items-center justify-center md:justify-start gap-3 mb-6">
                             <div className="bg-gray-900 p-2 rounded-xl shadow-xl">
                                 <TrendingUp size={20} className="text-emerald-400" />
                             </div>
                             <span className="text-xl font-black text-gray-900 tracking-tighter uppercase">ML Prediction Hub</span>
                         </div>
-                        <p className="text-[13px] text-gray-500 font-medium uppercase tracking-tight leading-relaxed">
-                            A machine learning–based system designed to analyze historical market data and generate predictive signals using advanced Random Forest ensembles.
+                        <p className="text-[13px] text-gray-500 font-bold uppercase tracking-tight leading-relaxed">
+                            A machine learning–based system designed to generate predictive signals using advanced Random Forest ensembles.
                         </p>
                     </div>
 
                     {/* Middle Column: Developer Info */}
-                    <div className="footer-reveal">
+                    <div className="footer-reveal text-center md:text-left w-full md:w-auto">
                         <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.4em] mb-6">Execution Lead</h4>
                         <p className="text-[15px] font-black text-gray-900 uppercase tracking-tight mb-2">Anshil Chotara</p>
                         <p className="text-[11px] font-bold text-emerald-500 uppercase tracking-[0.2em]">Backend & ML Developer</p>
                     </div>
 
                     {/* Right Column: Verified Links */}
-                    <div className="flex flex-col gap-5 footer-reveal">
+                    <div className="flex flex-col gap-5 footer-reveal items-center md:items-start w-full md:w-auto">
                         <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.4em] mb-2">Verified Connections</h4>
                         <a
                             href="https://www.linkedin.com/in/anshil-chotara-776075250/"
@@ -87,11 +87,11 @@ const Footer = () => {
 
                 {/* Bottom Bar: Legal & Disclaimer */}
                 <div className="pt-10 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6">
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">
-                        © 2026 ML Stockton Terminal. All Rights Reserved.
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] text-center md:text-left">
+                        © 2026 Stockton Terminal. All Rights Reserved.
                     </p>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 px-6 py-2 rounded-full border border-gray-100 italic">
-                        "This project is for educational and demonstration purposes only."
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 px-6 py-2 rounded-full border border-gray-100 italic text-center">
+                        "Handcrafted Logic. Quantitative Precision."
                     </p>
                 </div>
             </div>
