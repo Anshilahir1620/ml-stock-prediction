@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { RefreshCw, TrendingUp, BarChart2, Activity, ShieldCheck } from 'lucide-react';
-import axios from 'axios';
 import clsx from 'clsx';
 import gsap from 'gsap';
 import {
@@ -22,11 +21,10 @@ interface PredictionResponse {
     current_price: number;
 }
 
-const STOCKS = ['RELIANCE', 'TCS', 'ADANI', 'GOLD', 'SILVER', 'SUZLON'];
+const STOCKS = ['RELIANCE', 'TCS', 'SUZLON', 'ADANI POWER', 'TATA GOLD ETF', 'SILVER ETF'];
 
 // ── Helpers ──────────────────────────────────────────────────────────
 const generatePriceTrend = (baseReturn: number, currentPrice: number) => {
-    const data: { day: string; price: number }[] = [];
     // Start from Today and walk backwards to simulate history
     let price = currentPrice;
 
@@ -101,13 +99,41 @@ const Dashboard = () => {
 
     const fetchPrediction = async (stock: string) => {
         setLoading(true);
+        console.log(`Neural Terminal: Initiating request for ${stock.toUpperCase()}`);
         try {
-            const base = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
-            const { data } = await axios.get<PredictionResponse>(`${base}/predict`, { params: { stock } });
-            setPrediction(data);
-            setPriceTrend(generatePriceTrend(data.predicted_return, data.current_price));
-            setSignalHistory(generateSignalHistory(data.signal));
-        } catch {
+            const base = 'https://ml-stock-prediction.onrender.com';
+
+            const response = await fetch(`${base}/predict`, {
+                method: 'POST',
+                mode: 'cors',
+                credentials: 'omit',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ stock: stock.toUpperCase() })
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                alert(`API Error (${response.status}): ${errorText}`);
+                throw new Error(`HTTP ${response.status}: ${errorText}`);
+            }
+
+            const data = await response.json();
+            console.log("Neural Terminal: Data received", data);
+
+            if (data && data.stock) {
+                setPrediction(data);
+                setPriceTrend(generatePriceTrend(data.predicted_return, data.current_price));
+                setSignalHistory(generateSignalHistory(data.signal));
+            }
+        } catch (error: any) {
+            console.error('Neural Terminal Critical Failure:', error);
+            if (error.message === 'Failed to fetch') {
+                alert('Connection Blocked: This is likely a CORS error or Network issue. Please check your browser console.');
+            } else {
+                alert(`Error: ${error.message}`);
+            }
             setPrediction(null);
         } finally {
             setLoading(false);
