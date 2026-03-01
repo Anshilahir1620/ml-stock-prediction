@@ -227,14 +227,16 @@ const Home = () => {
                         { val: "7 Days", label: "PREDICTION WINDOW", color: "text-gray-900", desc: "Extended horizon for high-probability market synthesis." },
                         { val: "2+", label: "ML MODELS", color: "text-orange-500", desc: "Recursive evaluation of Logistic Regression and Random Forest clusters." }
                     ].map((m, i) => (
-                        <div key={i} className="text-center group flex flex-col items-center">
-                            <div className="mb-4 md:mb-6">
-                                <p className={`stat-num text-6xl md:text-[110px] font-black leading-[1.2] md:leading-none ${m.color} tracking-tighter group-hover:scale-105 transition-transform duration-500`}>
+                        <div key={i} className="text-center group flex flex-col items-center px-6">
+                            <div className="mb-10 md:mb-14 h-auto">
+                                <p className={`stat-num text-5xl md:text-[110px] font-black leading-none ${m.color} tracking-tighter group-hover:scale-105 transition-transform duration-500 block`}>
                                     {m.val}
                                 </p>
                             </div>
-                            <h4 className="text-[10px] md:text-[13px] font-black text-gray-400 uppercase tracking-[0.4em] mb-4 md:mb-8">{m.label}</h4>
-                            <p className="text-[12px] md:text-[14px] text-gray-400 font-bold uppercase tracking-tight leading-relaxed max-w-[260px] mx-auto opacity-70 px-4">
+                            <h4 className="text-[10px] md:text-[13px] font-black text-slate-400 uppercase tracking-[0.4em] mb-6 md:mb-8">
+                                {m.label}
+                            </h4>
+                            <p className="text-[12px] md:text-[14px] text-gray-400 font-bold uppercase tracking-tight leading-relaxed max-w-[260px] mx-auto opacity-70">
                                 {m.desc}
                             </p>
                         </div>

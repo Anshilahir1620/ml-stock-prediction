@@ -91,6 +91,7 @@ const Navbar = () => {
                         transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                         className="fixed inset-0 bg-[#0a0a0a] z-[9999] md:hidden overflow-y-auto"
                         style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh' }}
+                        onClick={() => setIsOpen(false)}
                     >
                         {/* THE GRID Background Overlay */}
                         <div className="fixed inset-0 opacity-[0.05] pointer-events-none"
@@ -119,7 +120,10 @@ const Navbar = () => {
                         </div>
 
                         {/* Centered Navigation Links with Scroll Padding */}
-                        <div className="relative z-[50] flex flex-col items-center px-8 pt-8 pb-32 min-h-[calc(100vh-100px)]">
+                        <div
+                            className="relative z-[50] flex flex-col items-center px-8 pt-8 pb-32 min-h-[calc(100vh-100px)]"
+                            onClick={(e) => e.stopPropagation()}
+                        >
                             <div className="w-full max-w-sm flex flex-col gap-4 mt-8">
                                 <p className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.8em] text-center mb-8 opacity-40 italic">System Directory</p>
 
