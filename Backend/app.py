@@ -11,10 +11,14 @@ from utils import prepare_features, generate_signal, THRESHOLD
 
 app = FastAPI(title="Stock Prediction API")
 
-# 🌐 CORS Configuration - Wildcard is safe with allow_credentials=False
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "https://ml-stock-prediction.onrender.com",
+        "*"   # keep for safety during dev
+    ],
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
