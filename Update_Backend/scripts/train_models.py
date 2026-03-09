@@ -4,8 +4,9 @@ from sklearn.ensemble import RandomForestClassifier
 import os
 
 STOCKS = [
-"TCS","Suzlon","Adani","Gold","SILVER","RELIANCE"
+"TCS","SUZLON","ADANI","GOLD","SILVER","RELIANCE"
 ]
+
 
 DATA_FOLDER = "data"
 MODEL_FOLDER = "models"

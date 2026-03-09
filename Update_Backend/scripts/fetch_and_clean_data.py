@@ -5,7 +5,7 @@ import os
 STOCKS = {
     "TCS": "TCS.NS",
     "SUZLON": "SUZLON.NS",
-    "Adani": "ADANIPOWER.NS",
+    "ADANI": "ADANIPOWER.NS",
     "GOLD": "TATAGOLD.NS",
     "SILVER": "SILVERBEES.NS",
     "RELIANCE": "RELIANCE.NS"
