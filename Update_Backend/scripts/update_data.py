@@ -5,6 +5,8 @@ import os
 stocks = {
     "RELIANCE": "RELIANCE.NS",
     "TCS": "TCS.NS",
+    "SILVER": "SILVERBEES.NS",
+    "GOLD": "TATAGOLD.NS",
     "ADANI": "ADANIENT.NS",
     "SUZLON": "SUZLON.NS"
 }
