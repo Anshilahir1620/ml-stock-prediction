@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 
 app = FastAPI()
-
+print("RUNNING UPDATE_BACKEND SERVER")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
