@@ -11,7 +11,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const API_BASE = 'https://ml-stock-prediction.onrender.com';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
 const Prediction = () => {
     const [supportedStocks, setSupportedStocks] = useState([]);
