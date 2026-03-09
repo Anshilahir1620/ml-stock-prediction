@@ -22,19 +22,11 @@ app.add_middleware(
 
 
 @app.get("/predict")
-
 def get_prediction(stock: str):
-
-    stock = stock.upper()
-
     try:
-
         result = predict_stock(stock)
-
         return result
-
-    except:
-
+    except Exception as e:
         return {
-            "error": "Stock not found"
+            "error": str(e)
         }
