@@ -8,11 +8,12 @@ print("RUNNING UPDATE_BACKEND SERVER")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://127.0.0.1:8000/predict?stock=Suzlon",
-        "http://127.0.0.1:5173",
-        "https://ml-stock-prediction.onrender.com",
-        "*"   # keep for safety during dev
-    ],
+        "https://ml-stock-prediction.vercel.app/",
+        "http://localhost:5173/"],  
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
