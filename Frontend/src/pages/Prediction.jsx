@@ -11,7 +11,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+const API_BASE = import.meta.env.VITE_API_URL || 'https://ml-stock-prediction.onrender.com';
 
 const Prediction = () => {
     const [supportedStocks, setSupportedStocks] = useState([]);
@@ -84,6 +84,7 @@ const Prediction = () => {
                     }
                 }
             } catch (err) {
+                console.log("Error ",err);
                 setError('Could not connect to backend.');
             } finally {
                 setStocksLoading(false);
