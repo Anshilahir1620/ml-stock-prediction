@@ -9,7 +9,12 @@ import {
 } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import Plot from 'react-plotly.js';
+import * as Plotly from 'plotly.js-dist-min';
+import createPlotlyComponent from 'react-plotly.js/factory';
+import { useLoading } from '../context/LoadingContext';
+import { useData } from '../context/DataContext';
+
+const Plot = createPlotlyComponent(Plotly);
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -19,6 +24,9 @@ const AIAnalytics = () => {
     const [stock, setStock] = useState('RELIANCE');
     const [historicalData, setHistoricalData] = useState([]);
     const [loading, setLoading] = useState(true);
+    const { setIsLoading } = useLoading();
+    const { getAnalytics, updateAnalytics } = useData();
+    const [isRevalidating, setIsRevalidating] = useState(false);
     const [error, setError] = useState(null);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const containerRef = useRef(null);
@@ -40,22 +48,38 @@ const AIAnalytics = () => {
     // Fetch data for the graphs
     useEffect(() => {
         const fetchData = async () => {
-            setLoading(true);
+            const startTime = Date.now();
+            setIsLoading(true); // Trigger satisfying global loader
+
+            const cached = getAnalytics(stock);
+            if (cached) {
+                setHistoricalData(cached.data);
+                setIsRevalidating(true);
+            } else {
+                setLoading(true);
+            }
+
             try {
                 setError(null);
-                const response = await axios.get(`${API_BASE}/historical-data`, {
-                    params: { stock: stock }
-                });
-                if (response.data && response.data.data) {
-                    setHistoricalData(response.data.data);
-                } else {
+                const freshData = await updateAnalytics(stock);
+                if (freshData) {
+                    setHistoricalData(freshData);
+                } else if (!cached) {
                     setError("Data cluster inaccessible.");
                 }
             } catch (err) {
                 console.error("Error fetching analytics data:", err);
-                setError("Failed to load neural data clusters.");
+                if (!cached) setError("Failed to load neural data clusters.");
             } finally {
-                setLoading(false);
+                const minDuration = 2100; // 2.1 seconds for satisfying AI experience
+                const elapsed = Date.now() - startTime;
+                const remaining = Math.max(0, minDuration - elapsed);
+
+                setTimeout(() => {
+                    setLoading(false);
+                    setIsLoading(false);
+                    setTimeout(() => setIsRevalidating(false), 2000);
+                }, remaining);
             }
         };
         fetchData();
@@ -231,28 +255,116 @@ const AIAnalytics = () => {
              <div className="absolute bottom-40 left-[-10%] w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-[150px] -z-10" />
 
              {/* MAIN HEADER */}
-             <div className="max-w-4xl mb-12 reveal-analytics">
-                <div className="flex flex-wrap items-center gap-4 mb-8">
-                    <div className="bg-white shadow-sm text-emerald-500 px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.5em] border border-emerald-50 border-emerald-100 flex items-center gap-3">
-                        <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                        Neural Analytics Engine v4.2
+             <div className="flex flex-col lg:flex-row items-center justify-between mb-24 gap-12 reveal-analytics relative z-[100] !overflow-visible">
+                <div className="max-w-4xl">
+                    <div className="flex flex-wrap items-center gap-4 mb-8">
+                        {isRevalidating ? (
+                            <div className="bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.2)] text-white px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.5em] border border-emerald-400 flex items-center gap-3 animate-pulse">
+                                <div className="w-1.5 h-1.5 bg-white rounded-full animate-ping" />
+                                Syncing Neural Node...
+                            </div>
+                        ) : (
+                            <div className="bg-white shadow-sm text-emerald-500 px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.5em] border border-emerald-50 border-emerald-100 flex items-center gap-3">
+                                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                                Neural Analytics Engine v4.2
+                            </div>
+                        )}
+                        <div className="bg-slate-900 shadow-sm text-white px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.5em] border border-slate-800 flex items-center gap-3">
+                            <Database size={12} className="text-emerald-400" />
+                            Real-time Node Access
+                        </div>
                     </div>
-                    <div className="bg-slate-900 shadow-sm text-white px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.5em] border border-slate-800 flex items-center gap-3">
-                        <Database size={12} className="text-emerald-400" />
-                        Real-time Node Access
+                    
+                    <h1 className="text-4xl sm:text-5xl md:text-[85px] font-black text-gray-900 mb-8 tracking-tighter leading-[1] md:leading-[0.95]">
+                        AI Analysis <br /> <span className="text-gray-400 italic font-medium">Visualization.</span>
+                    </h1>
+                    
+                    <p className="text-[18px] text-gray-400 font-bold uppercase tracking-tight leading-relaxed max-w-2xl">
+                        Interactive multi-dimensional mapping of our core predictive logic and feature relationship vectors.
+                    </p>
+                </div>
+
+                {/* PREMIUM NEURAL NODE ANIMATION (Right Section) */}
+                <div className="relative w-full lg:w-[450px] h-[350px] flex items-center justify-center group overflow-hidden">
+                    <div className="absolute inset-0 bg-emerald-500/5 rounded-full blur-[100px] group-hover:bg-emerald-500/10 transition-colors duration-1000" />
+                    
+                    {/* SVG Visualizer */}
+                    <svg viewBox="0 0 200 200" className="w-full h-full relative z-10 drop-shadow-2xl">
+                        {/* Orbiting Ring 1 */}
+                        <motion.circle 
+                            cx="100" cy="100" r="80" 
+                            stroke="rgba(16, 185, 129, 0.1)" 
+                            strokeWidth="0.5" fill="none"
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                        />
+                        {/* Orbiting Ring 2 */}
+                        <motion.ellipse 
+                            cx="100" cy="100" rx="90" ry="40" 
+                            stroke="rgba(16, 185, 129, 0.2)" 
+                            strokeWidth="1" fill="none"
+                            animate={{ rotate: -360 }}
+                            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                        />
+                        {/* Data Particles */}
+                        {[...Array(15)].map((_, i) => (
+                            <motion.circle
+                                key={i}
+                                r="1.5"
+                                fill="#10b981"
+                                animate={{
+                                    cx: [100 + Math.cos(i) * 70, 100 + Math.cos(i + 1.5) * 70, 100 + Math.cos(i + 3) * 70, 100 + Math.cos(i) * 70],
+                                    cy: [100 + Math.sin(i * 2) * 40, 100 + Math.sin(i * 2.5) * 40, 100 + Math.sin(i * 2) * 40],
+                                    opacity: [0.2, 0.8, 0.2]
+                                }}
+                                transition={{
+                                    duration: 4 + Math.random() * 4,
+                                    repeat: Infinity,
+                                    ease: "easeInOut",
+                                    delay: i * 0.2
+                                }}
+                            />
+                        ))}
+                        {/* Central Node */}
+                        <motion.g
+                            animate={{ scale: [1, 1.05, 1] }}
+                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                        >
+                            <circle cx="100" cy="100" r="28" fill="#0f172a" stroke="#10b981" strokeWidth="2" className="shadow-lg" />
+                            <motion.path 
+                                d="M90 100 L110 100 M100 90 L100 110" 
+                                stroke="#10b981" strokeWidth="2" strokeLinecap="round"
+                                animate={{ rotate: 90 }}
+                                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                            />
+                            <motion.circle 
+                                cx="100" cy="100" r="14" 
+                                fill="none" stroke="#10b981" strokeWidth="0.5" strokeDasharray="4 4"
+                                animate={{ rotate: -360 }}
+                                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                            />
+                        </motion.g>
+                    </svg>
+
+                    {/* Scanning Text Floating */}
+                    <div className="absolute top-4 right-4 text-right">
+                        <div className="text-[8px] font-black text-emerald-500 uppercase tracking-widest leading-none mb-1">Status</div>
+                        <div className="text-[10px] font-black text-gray-900 tracking-tighter uppercase mb-3">Live Synthesis</div>
+                        <div className="flex gap-1 justify-end">
+                            {[...Array(5)].map((_, i) => (
+                                <motion.div 
+                                    key={i} 
+                                    className="w-1 h-3 bg-emerald-500/20 rounded-full"
+                                    animate={{ height: [4, 12, 4], opacity: [0.3, 1, 0.3] }}
+                                    transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.1 }}
+                                />
+                            ))}
+                        </div>
                     </div>
                 </div>
-                
-                <h1 className="text-4xl sm:text-5xl md:text-[85px] font-black text-gray-900 mb-8 tracking-tighter leading-[1] md:leading-[0.95]">
-                    AI Analysis <br /> <span className="text-gray-400 italic font-medium">Visualization.</span>
-                </h1>
-                
-                <p className="text-[18px] text-gray-400 font-bold uppercase tracking-tight leading-relaxed max-w-2xl mb-16">
-                    Interactive multi-dimensional mapping of our core predictive logic and feature relationship vectors.
-                </p>
-
+             </div>
                 {/* STOCK SELECTOR */}
-                <div className="relative z-[300] max-w-md" ref={dropdownRef}>
+                <div className="relative z-[300] max-w-md !overflow-visible" ref={dropdownRef}>
                     <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] mb-4 flex items-center gap-3 italic">
                         <Network size={14} className="text-emerald-500" />
                         Target Asset Stream
@@ -275,12 +387,13 @@ const AIAnalytics = () => {
 
                     <AnimatePresence>
                         {isDropdownOpen && (
-                            <motion.div
+                             <motion.div
+                                key="stock-selector-dropdown"
                                 initial={{ opacity: 0, y: 15, scale: 0.95 }}
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                 transition={{ duration: 0.3, ease: "easeOut" }}
-                                className="absolute top-full left-0 right-0 mt-4 bg-white border border-slate-100 rounded-[2.5rem] shadow-[0_40px_80px_-15px_rgba(0,0,0,0.15)] z-[200] overflow-hidden py-4"
+                                className="absolute top-full left-0 right-0 mt-4 bg-white border border-slate-100 rounded-[2.5rem] shadow-[0_40px_80px_-15px_rgba(0,0,0,0.2)] z-[500] overflow-hidden py-4"
                             >
                                 <div className="px-8 py-4 border-b border-slate-50 mb-2">
                                     <div className="text-[11px] font-black text-slate-300 uppercase tracking-[0.3em] flex items-center gap-2">
@@ -344,10 +457,9 @@ const AIAnalytics = () => {
                         </button>
                     </motion.div>
                 )}
-             </div>
 
              {/* GRAPHS GRID */}
-             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16">
+             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16 relative z-0">
                 
                 {/* GRAPH 1: FEATURE SCATTER */}
                 <motion.div 
@@ -392,14 +504,19 @@ const AIAnalytics = () => {
                         )}
                     </div>
 
-                    <div className="mt-10 grid grid-cols-2 gap-6 pt-10 border-t border-gray-50">
-                        <div className="flex items-center gap-3">
-                            <div className="w-3 h-3 bg-emerald-500 rounded-full" />
-                            <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Long Potential</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <div className="w-3 h-3 bg-rose-500 rounded-full" />
-                            <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Short Potential</span>
+                    <div className="mt-10 pt-10 border-t border-gray-50">
+                        <p className="text-[13px] text-gray-400 font-bold leading-relaxed uppercase tracking-tight mb-6">
+                            This scatter plot shows "Data Clusters." Each dot is a moment in time where the AI recognized a specific price pattern.
+                        </p>
+                        <div className="grid grid-cols-2 gap-6">
+                            <div className="flex items-center gap-3">
+                                <div className="w-3 h-3 bg-emerald-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+                                <span className="text-[11px] font-black text-gray-800 uppercase tracking-widest">Growth Zone (Long)</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="w-3 h-3 bg-rose-500 rounded-full shadow-[0_0_10px_rgba(244,63,94,0.5)]" />
+                                <span className="text-[11px] font-black text-gray-800 uppercase tracking-widest">Risk Zone (Short)</span>
+                            </div>
                         </div>
                     </div>
                 </motion.div>
@@ -454,50 +571,60 @@ const AIAnalytics = () => {
 
                     <div className="mt-10 pt-10 border-t border-gray-50">
                         <p className="text-[13px] text-gray-400 font-bold leading-relaxed uppercase tracking-tight">
-                            The surface visualizes the model's <span className="text-emerald-600 font-black">probability field</span> across the volatility-trend axes. Higher peaks represent optimized institutional entry windows.
+                            Think of this as an <span className="text-emerald-600 font-black">AI Weather Map</span>. High green peaks show where the market is stable and likely to go up. Deep valleys show where the market is chaotic and risky. It helps you see the safest "path" for the stock price.
                         </p>
                     </div>
                 </motion.div>
 
              </div>
 
-             {/* INFO SECTION */}
-             <div className="mt-32 reveal-analytics bg-gray-900 p-12 md:p-24 rounded-[4rem] text-white relative overflow-hidden shadow-2xl">
+              {/* INFO SECTION */}
+             <div className="mt-20 reveal-analytics bg-gray-900 p-10 md:p-16 rounded-[3rem] text-white relative overflow-hidden shadow-2xl">
                 <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
                 
-                <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
-                    <div className="lg:col-span-7">
-                        <div className="flex items-center gap-4 mb-8">
-                            <Activity className="text-emerald-400" size={32} />
-                            <h2 className="text-3xl md:text-5xl font-black italic tracking-tighter uppercase">Algorithm <span className="text-gray-500">Integrity.</span></h2>
+                <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+                    <div className="lg:col-span-8 text-center md:text-left">
+                        <div className="flex items-center justify-center md:justify-start gap-4 mb-6">
+                            <Activity className="text-emerald-400" size={24} />
+                            <h2 className="text-2xl md:text-[42px] font-black italic tracking-tighter uppercase leading-[0.9]">Visualizing <br /><span className="text-gray-500">ML Topology.</span></h2>
                         </div>
-                        <p className="text-[18px] md:text-[22px] text-gray-400 font-bold leading-relaxed uppercase tracking-tight mb-12">
-                            Transparency is our core protocol. By exposing the 3D topology of our models, we bridge the gap between AI black-boxes and institutional quantitative analysis.
+                        <p className="text-[13px] md:text-[15px] text-gray-400 font-bold leading-relaxed uppercase tracking-tight mb-8">
+                            Our AI scanning engine processes thousands of data points to find hidden patterns in the market. We use 3D visualization to show exactly how the model makes decisions, mapping complex price movements into simple, actionable visual signals.
                         </p>
-                        <div className="flex flex-wrap gap-4">
-                            <div className="px-8 py-4 bg-white/5 border border-white/10 rounded-2xl flex items-center gap-4">
-                                <Binary className="text-emerald-400" size={20} />
-                                <span className="text-[12px] font-black uppercase tracking-widest">Non-Linear Synthesis</span>
+                        <div className="flex flex-wrap gap-3 justify-center md:justify-start">
+                            <div className="px-6 py-3 bg-white/5 border border-white/10 rounded-xl flex items-center gap-3">
+                                <Binary className="text-emerald-400" size={16} />
+                                <span className="text-[10px] font-black uppercase tracking-widest">3D Scatter Synergy</span>
                             </div>
-                            <div className="px-8 py-4 bg-white/5 border border-white/10 rounded-2xl flex items-center gap-4">
-                                <ShieldCheck className="text-emerald-400" size={20} />
-                                <span className="text-[12px] font-black uppercase tracking-widest">Risk-Aware Logic</span>
+                            <div className="px-6 py-3 bg-white/5 border border-white/10 rounded-xl flex items-center gap-3">
+                                <ShieldCheck className="text-emerald-400" size={16} />
+                                <span className="text-[10px] font-black uppercase tracking-widest">Neural Surface Topology</span>
                             </div>
                         </div>
                     </div>
-                    <div className="lg:col-span-5 grid grid-cols-2 gap-6">
-                        {[
-                            { label: 'Cluster Density', value: '4.8x', desc: 'Feature grouping affinity' },
-                            { label: 'Neural Depth', value: '200', desc: 'Recursive tree ensemble' },
-                            { label: 'Signal Noise', value: '<0.02', desc: 'Optimized filtering' },
-                            { label: 'Logic Sync', value: '15ms', desc: 'Real-time response' }
-                        ].map((stat, i) => (
-                            <div key={i} className="p-8 bg-white/5 border border-white/10 rounded-[2.5rem] hover:border-emerald-500/50 transition-colors group">
-                                <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">{stat.label}</h4>
-                                <p className="text-2xl font-black mb-2 group-hover:text-emerald-400 transition-colors uppercase italic">{stat.value}</p>
-                                <p className="text-[9px] font-bold text-gray-600 uppercase tracking-widest">{stat.desc}</p>
-                            </div>
-                        ))}
+                    <div className="lg:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
+                        <div className="p-8 bg-white/5 border border-white/10 rounded-[2rem] hover:border-emerald-500/50 transition-all duration-500 group">
+                             <div className="flex items-center gap-3 mb-4">
+                                <div className="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                                    <Zap size={20} />
+                                </div>
+                                <h4 className="text-[14px] font-black text-white uppercase tracking-widest leading-none">AI Market Patterns</h4>
+                             </div>
+                             <p className="text-[11px] font-bold text-gray-500 uppercase tracking-tight leading-relaxed">
+                                 The <span className="text-white">Pattern Recognition</span> plot shows how the AI identifies "Bullish" (green) and "Bearish" (red) clusters. By mapping <span className="text-emerald-400">Daily Returns</span> against <span className="text-emerald-400">Price Gaps</span>, it visualizes exactly where institutional money is likely moving, helping you spot high-probability entry points.
+                             </p>
+                        </div>
+                        <div className="p-8 bg-white/5 border border-white/10 rounded-[2rem] hover:border-indigo-500/50 transition-all duration-500 group">
+                             <div className="flex items-center gap-3 mb-4">
+                                <div className="w-10 h-10 bg-indigo-500/20 rounded-xl flex items-center justify-center text-indigo-400 group-hover:bg-indigo-500 group-hover:text-white transition-all">
+                                    <Cpu size={20} />
+                                </div>
+                                <h4 className="text-[14px] font-black text-white uppercase tracking-widest leading-none">Risk & Confidence Map</h4>
+                             </div>
+                             <p className="text-[11px] font-bold text-gray-500 uppercase tracking-tight leading-relaxed">
+                                 The <span className="text-white">Confidence Surface</span> acts as a market "weather report." High peaks show where the model has the most certainty about a trend, while deep valleys highlight high-risk zones. It maps <span className="text-indigo-400">Volatility</span> against the <span className="text-indigo-400">Trend</span> to show you where the market is stable enough for smart trading.
+                             </p>
+                        </div>
                     </div>
                 </div>
              </div>

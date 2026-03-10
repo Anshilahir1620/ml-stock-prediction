@@ -13,7 +13,18 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  scroll-behavior: smooth;
+  scroll-behavior: auto; /* Handled by Lenis */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+html {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 
 html.lenis,
@@ -37,15 +48,28 @@ html.lenis body {
   pointer-events: none;
 }
 
-/* Custom Scrollbar for specific elements */
+/* Elegant Custom Scrollbar for internal components */
 .custom-scrollbar::-webkit-scrollbar {
+  width: 4px !important;
   display: block !important;
-  width: 5px !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.15);
 }
 
 .custom-scrollbar {
-  -ms-overflow-style: auto !important;
-  scrollbar-width: thin !important;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.05) transparent;
 }
 
 body {

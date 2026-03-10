@@ -13,7 +13,6 @@ const Navbar = () => {
     // Mapping existing routes to requested professional names
     const navItems = [
         { name: 'Home', path: '/', icon: <Home size={22} /> },
-        { name: 'How It Works', path: '/how-it-works', icon: <Info size={22} /> },
         { name: 'Project Workflow', path: '/how-it-works', icon: <GitBranch size={22} /> },
         { name: 'AI Analytics', path: '/analytics', icon: <Box size={22} /> },
         { name: 'Prediction / Models', path: '/predict', icon: <Cpu size={22} /> },
@@ -44,7 +43,7 @@ const Navbar = () => {
     }, [isOpen]);
 
     return (
-        <nav className="fixed top-0 left-0 right-0 z-[100] bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100 px-6 md:px-24 py-4 flex justify-between items-center h-20">
+        <nav className="fixed top-0 left-0 right-0 z-[1000] bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100 px-6 md:px-24 py-4 flex justify-between items-center h-20">
             {/* Logo */}
             <NavLink to="/" className="flex items-center gap-3 font-bold text-lg tracking-tight text-gray-900 z-[110]">
                 <div className="bg-gray-900 p-1.5 rounded-lg shadow-lg">
@@ -55,7 +54,7 @@ const Navbar = () => {
 
             {/* Desktop Navigation (Hidden on Mobile) */}
             <div className="hidden md:flex items-center gap-10">
-                {navItems.filter(item => ['Home', 'How It Works', 'AI Analytics', 'Prediction / Models', 'About'].includes(item.name)).map((item) => (
+                {navItems.filter(item => ['Home', 'Project Workflow', 'AI Analytics', 'Prediction / Models', 'About'].includes(item.name)).map((item) => (
                     <NavLink
                         key={item.path}
                         to={item.path}
@@ -142,16 +141,16 @@ const Navbar = () => {
                                             {isExternal ? (
                                                 <a
                                                     href={item.path}
-                                                    className="flex items-center gap-6 py-4 px-7 rounded-[2rem] transition-all duration-500 group relative border border-white/0 hover:border-white/10 hover:bg-white/5"
+                                                    className="flex items-center gap-5 py-3.5 px-6 rounded-[1.5rem] transition-all duration-500 group relative border border-white/0 hover:border-white/10 hover:bg-white/5"
                                                 >
-                                                    <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-gray-500 group-hover:text-white transition-colors duration-500">
+                                                    <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-gray-500 group-hover:text-white transition-colors duration-500">
                                                         {item.icon}
                                                     </div>
                                                     <div className="flex flex-col text-left">
-                                                        <span className="text-[24px] font-black uppercase tracking-tight text-gray-400 group-hover:text-white transition-colors duration-500">
+                                                        <span className="text-[20px] font-black uppercase tracking-tight text-gray-400 group-hover:text-white transition-colors duration-500">
                                                             {item.name}
                                                         </span>
-                                                        <span className="text-[9px] font-bold text-gray-600 uppercase tracking-[0.3em] mt-1">
+                                                        <span className="text-[8px] font-bold text-gray-600 uppercase tracking-[0.2em] mt-0.5">
                                                             Outgoing Link
                                                         </span>
                                                     </div>
@@ -161,22 +160,22 @@ const Navbar = () => {
                                                     to={item.path}
                                                     onClick={() => setIsOpen(false)}
                                                     className={({ isActive }) =>
-                                                        `flex items-center gap-6 py-4 px-7 rounded-[2rem] transition-all duration-500 group relative border ${isActive ? 'bg-white/5 border-white/10' : 'border-white/0 hover:border-white/10 hover:bg-white/5'}`
+                                                        `flex items-center gap-5 py-3.5 px-6 rounded-[1.5rem] transition-all duration-500 group relative border ${isActive ? 'bg-white/5 border-white/10' : 'border-white/0 hover:border-white/10 hover:bg-white/5'}`
                                                     }
                                                 >
-                                                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 ${isActive ? 'bg-emerald-500 text-white shadow-[0_0_30px_rgba(16,185,129,0.4)]' : 'bg-white/5 text-gray-400 group-hover:text-white'}`}>
+                                                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-500 ${isActive ? 'bg-emerald-500 text-white shadow-[0_0_25px_rgba(16,185,129,0.3)]' : 'bg-white/5 text-gray-400 group-hover:text-white'}`}>
                                                         {item.icon}
                                                     </div>
                                                     <div className="flex flex-col text-left">
-                                                        <span className={`text-[24px] font-black uppercase tracking-tight ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-white'}`}>
+                                                        <span className={`text-[20px] font-black uppercase tracking-tight ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-white'}`}>
                                                             {item.name}
                                                         </span>
-                                                        <span className="text-[9px] font-bold text-gray-600 uppercase tracking-[0.3em] mt-1">
+                                                        <span className="text-[8px] font-bold text-gray-600 uppercase tracking-[0.2em] mt-0.5">
                                                             {isActive ? 'Current Node' : 'Initialize Session'}
                                                         </span>
                                                     </div>
                                                     {isActive && (
-                                                        <ArrowRight size={20} className="ml-auto text-emerald-500" />
+                                                        <ArrowRight size={16} className="ml-auto text-emerald-500" />
                                                     )}
                                                 </NavLink>
                                             )}

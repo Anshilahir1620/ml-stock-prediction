@@ -8,6 +8,8 @@ import {
 } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useLoading } from '../context/LoadingContext';
+import { useData } from '../context/DataContext';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -19,6 +21,9 @@ const Prediction = () => {
     const [loading, setLoading] = useState(false);
     const [stocksLoading, setStocksLoading] = useState(true);
     const [result, setResult] = useState(null);
+    const { setIsLoading } = useLoading();
+    const { getPrediction, updatePrediction } = useData();
+    const [isRevalidating, setIsRevalidating] = useState(false);
     const [error, setError] = useState(null);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [hoveredData, setHoveredData] = useState(null);
@@ -31,41 +36,56 @@ const Prediction = () => {
     const mainGridRef = useRef(null);
     const intelligenceRef = useRef(null);
 
-    // ─── PREDICT ───
+    // ─── PREDICT with CACHE / SWR ───
     const handlePredict = async (ticker = stock) => {
         const symbolToPredict = ticker || stock;
         if (!symbolToPredict) return;
 
-        setLoading(true);
+        const startTime = Date.now();
+        setIsLoading(true); // Triggers satisfying global loader
+
+        const cached = getPrediction(symbolToPredict);
+        if (cached) {
+            setResult(cached.data);
+            setIsRevalidating(true);
+        } else {
+            setLoading(true);
+        }
+
         setError(null);
         setIsDropdownOpen(false);
 
         try {
-            const response = await axios.post(`${API_BASE}/predict`, { stock: symbolToPredict });
-            const { stock: resStock } = response.data;
-            if (resStock === undefined) {
-                setError('API returned an incomplete response.');
-                return;
+            const freshData = await updatePrediction(symbolToPredict);
+            if (freshData) {
+                setResult(freshData);
+                
+                // GSAP Draw-in for the chart
+                setTimeout(() => {
+                    const path = pathRef.current;
+                    if (path && typeof path.getTotalLength === 'function') {
+                        const length = path.getTotalLength();
+                        gsap.set(path, { strokeDasharray: length, strokeDashoffset: length });
+                        gsap.to(path, {
+                            strokeDashoffset: 0,
+                            duration: 0.8,
+                            ease: "power2.out"
+                        });
+                    }
+                }, 100);
             }
-            setResult(response.data);
-
-            // GSAP Draw-in for the chart if path is present (after state update)
-            setTimeout(() => {
-                const path = pathRef.current;
-                if (path && typeof path.getTotalLength === 'function') {
-                    const length = path.getTotalLength();
-                    gsap.set(path, { strokeDasharray: length, strokeDashoffset: length });
-                    gsap.to(path, {
-                        strokeDashoffset: 0,
-                        duration: 0.8,
-                        ease: "power2.out"
-                    });
-                }
-            }, 100);
         } catch (err) {
-            setError(err.response?.data?.detail || 'Prediction failed.');
+            if (!cached) setError('Prediction failed.');
         } finally {
-            setLoading(false);
+            const minDuration = 2100; // 2.1 seconds for satisfying AI experience
+            const elapsed = Date.now() - startTime;
+            const remaining = Math.max(0, minDuration - elapsed);
+
+            setTimeout(() => {
+                setLoading(false);
+                setIsLoading(false);
+                setTimeout(() => setIsRevalidating(false), 2000);
+            }, remaining);
         }
     };
 
@@ -73,14 +93,15 @@ const Prediction = () => {
     useEffect(() => {
         const fetchStocks = async () => {
             setStocksLoading(true);
+            // We don't need setIsLoading(true) here as it's handled by handlePredict
             try {
                 const response = await axios.get(`${API_BASE}/`);
                 if (response.data.supported_stocks && Array.isArray(response.data.supported_stocks)) {
-                    const firstStock = response.data.supported_stocks[0];
-                    setSupportedStocks(response.data.supported_stocks);
-                    if (firstStock) {
-                        setStock(firstStock);
-                        handlePredict(firstStock);
+                    const stocks = response.data.supported_stocks;
+                    setSupportedStocks(stocks);
+                    if (stocks[0]) {
+                        setStock(stocks[0]);
+                        handlePredict(stocks[0]);
                     }
                 }
             } catch (err) {
@@ -88,6 +109,7 @@ const Prediction = () => {
                 setError('Could not connect to backend.');
             } finally {
                 setStocksLoading(false);
+                // Note: setIsLoading(false) is handled by handlePredict which is called above
             }
         };
         fetchStocks();
@@ -293,10 +315,10 @@ const Prediction = () => {
                                         className="absolute top-full left-0 right-0 mt-4 bg-white border border-slate-100 rounded-[2.5rem] shadow-[0_40px_80px_-15px_rgba(0,0,0,0.15)] z-[200] overflow-hidden py-4"
                                     >
                                         <div className="px-8 py-4 border-b border-slate-50 mb-2">
-                                            <p className="text-[11px] font-black text-slate-300 uppercase tracking-[0.3em] flex items-center gap-2">
+                                            <div className="text-[11px] font-black text-slate-300 uppercase tracking-[0.3em] flex items-center gap-2">
                                                 <div className="w-1 h-1 bg-slate-200 rounded-full" />
                                                 Available Assets
-                                            </p>
+                                            </div>
                                         </div>
                                         <div 
                                             className="max-h-[320px] overflow-y-auto px-4 custom-scrollbar" 
@@ -387,10 +409,15 @@ const Prediction = () => {
                         <div className="bg-white border border-slate-100 p-8 rounded-[2.5rem] shadow-sm relative overflow-hidden flex-1 flex flex-col">
                             <div className="flex items-center justify-between mb-8">
                                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Structural Signal</span>
-                                {result && (
+                                {isRevalidating ? (
+                                    <div className="flex items-center gap-2 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100 animate-pulse">
+                                        <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping" />
+                                        <span className="text-[9px] font-black text-emerald-600 uppercase">Updating Live Node</span>
+                                    </div>
+                                ) : result && (
                                     <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1 rounded-full">
                                         <div className="w-1 h-1 bg-slate-400 rounded-full" />
-                                        <span className="text-[9px] font-bold text-slate-500 uppercase">Verified</span>
+                                        <span className="text-[9px] font-bold text-slate-500 uppercase">Verified Data Cluster</span>
                                     </div>
                                 )}
                             </div>
@@ -508,7 +535,15 @@ const Prediction = () => {
 
                                             <motion.path
                                                 ref={pathRef}
-                                                d="M0,35 L10,38 L20,32 L30,35 L40,28 L50,30 L60,22 L70,25 L80,18 L90,20 L100,15"
+                                                initial={{ d: "M0,25 L10,24 L20,26 L30,24 L40,25 L50,23 L60,27 L70,25 L80,24 L90,26 L100,25" }}
+                                                animate={{ 
+                                                    d: result?.signal === 'BUY' 
+                                                        ? "M0,45 L10,42 L20,38 L30,40 L40,32 L50,35 L60,25 L70,28 L80,15 L90,18 L100,8"
+                                                        : result?.signal === 'SELL'
+                                                            ? "M0,8 L10,12 L20,18 L30,15 L40,25 L50,22 L60,35 L70,32 L80,42 L90,40 L100,48"
+                                                            : "M0,25 L10,24 L20,26 L30,24 L40,25 L50,23 L60,27 L70,25 L80,24 L90,26 L100,25"
+                                                }}
+                                                transition={{ duration: 1, ease: "easeInOut" }}
                                                 fill="none"
                                                 stroke={result ? (result.signal === 'BUY' ? '#10b981' : result.signal === 'SELL' ? '#ef4444' : '#64748b') : '#e2e8f0'}
                                                 strokeWidth="1.2"
@@ -609,27 +644,7 @@ const Prediction = () => {
                 </section>
             </div>
 
-            {/* INLINE CUSTOM STYLES */}
-            <style dangerouslySetInnerHTML={{
-                __html: `
-                .custom-scrollbar::-webkit-scrollbar {
-                    width: 5px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-track {
-                    background: transparent;
-                }
-                .custom-scrollbar::-webkit-scrollbar-thumb {
-                    background: rgba(0, 0, 0, 0.05);
-                    border-radius: 100px;
-                    border: 1px solid transparent;
-                }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                    background: rgba(0, 0, 0, 0.1);
-                }
-                .custom-scrollbar {
-                    scrollbar-gutter: stable;
-                }
-            `}} />
+            {/* NO LOCAL STYLES NEEDED - HANDLED BY INDEX.CSS */}
         </div >
     );
 };
