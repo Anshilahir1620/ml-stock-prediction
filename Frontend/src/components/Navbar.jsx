@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
     TrendingUp, Info, PieChart, Home, Menu, X,
-    ArrowRight, GitBranch, Cpu, MessageSquare
+    ArrowRight, GitBranch, Cpu, MessageSquare, Box
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -15,6 +15,7 @@ const Navbar = () => {
         { name: 'Home', path: '/', icon: <Home size={22} /> },
         { name: 'How It Works', path: '/how-it-works', icon: <Info size={22} /> },
         { name: 'Project Workflow', path: '/how-it-works', icon: <GitBranch size={22} /> },
+        { name: 'AI Analytics', path: '/analytics', icon: <Box size={22} /> },
         { name: 'Prediction / Models', path: '/predict', icon: <Cpu size={22} /> },
         { name: 'About', path: '/about', icon: <PieChart size={22} /> },
         { name: 'Contact', path: 'mailto:anshilchotara@gmail.com', icon: <MessageSquare size={22} />, isExternal: true },
@@ -54,7 +55,7 @@ const Navbar = () => {
 
             {/* Desktop Navigation (Hidden on Mobile) */}
             <div className="hidden md:flex items-center gap-10">
-                {navItems.filter(item => ['Home', 'How It Works', 'Prediction / Models', 'About'].includes(item.name)).map((item) => (
+                {navItems.filter(item => ['Home', 'How It Works', 'AI Analytics', 'Prediction / Models', 'About'].includes(item.name)).map((item) => (
                     <NavLink
                         key={item.path}
                         to={item.path}

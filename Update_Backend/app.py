@@ -25,6 +25,9 @@ app.add_middleware(
         "https://ml-stock-prediction.vercel.app",
         "http://localhost:5173",
         "http://127.0.0.1:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5174",
+        "http://localhost:3000",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -114,6 +117,47 @@ def get_prediction(stock: str):
         return result
     except FileNotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/historical-data")
+def get_historical(stock: str):
+    import pandas as pd
+    stock = stock.strip().upper()
+    if stock not in SUPPORTED_STOCKS:
+        raise HTTPException(status_code=404, detail=f"Stock {stock} not supported.")
+    
+    refresh_if_needed(stock)
+    
+    csv_path = f"data/{stock}.csv"
+    if not os.path.exists(csv_path):
+         raise HTTPException(status_code=404, detail="Historical data file not found.")
+    
+    try:
+        df = pd.read_csv(csv_path)
+        # Select last 100 entries for meaningful visualization
+        # We need Daily_Return, Gap, High_Low_Range for the scatter plot
+        # We'll use Tomorrow_Return to determine signal (BUY/SELL)
+        df_viz = df.tail(101).copy()
+        
+        # Calculate features requested by user for 3D plots
+        df_viz["Prev_Return"] = df_viz["Daily_Return"].shift(1)
+        df_viz["Volatility"] = df_viz["High_Low_Range"]
+        
+        # Drop the first row which will have NaN for Prev_Return, but we fetch 101 to keep 100
+        df_viz = df_viz.iloc[1:].copy()
+        
+        # Clean for JSON (handle NaN if any)
+        df_viz = df_viz.fillna(0)
+        
+        # Signal logic: if tomorrow return > 0, it's a BUY day (green), else SELL (red)
+        df_viz["Signal"] = df_viz["Tomorrow_Return"].apply(lambda x: "BUY" if x > 0 else "SELL")
+        
+        records = df_viz[["Date", "Daily_Return", "Gap", "High_Low_Range", "Signal", "Tomorrow_Return", "Close", "Volatility", "Prev_Return"]].to_dict(orient="records")
+        return {
+            "stock": stock,
+            "data": records
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
