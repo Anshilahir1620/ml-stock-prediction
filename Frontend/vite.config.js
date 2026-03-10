@@ -9,7 +9,7 @@ export default defineConfig({
   },
   build: {
     commonjsOptions: {
-      include: [/plotly.js-dist-min/, /react-plotly.js/]
+      include: [/node_modules/, /plotly.js-dist-min/, /react-plotly.js/]
     }
   }
 })
