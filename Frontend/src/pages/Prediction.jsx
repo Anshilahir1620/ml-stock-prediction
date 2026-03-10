@@ -182,6 +182,13 @@ const Prediction = () => {
             iconBg: 'bg-slate-50 text-slate-400',
         },
         {
+            label: 'Live Market Price',
+            value: result ? `₹${result.current_price.toLocaleString('en-IN')}` : '—',
+            icon: <DollarSign size={14} />,
+            color: 'text-slate-900',
+            iconBg: 'bg-emerald-50 text-emerald-500',
+        },
+        {
             label: 'Predicted Return',
             value: result ? `${(result.predicted_return * 100).toFixed(2)}%` : '—',
             icon: result && result.predicted_return >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />,
@@ -189,18 +196,11 @@ const Prediction = () => {
             iconBg: result ? (result.predicted_return >= 0 ? 'bg-emerald-50 text-emerald-500' : 'bg-rose-50 text-rose-500') : 'bg-slate-50 text-slate-300',
         },
         {
-            label: 'Signal Threshold',
-            value: result ? `±${(result.threshold * 100).toFixed(2)}%` : '—',
+            label: 'Signal Confidence',
+            value: result && result.confidence ? `${result.confidence}%` : (result ? `±${(result.threshold * 100).toFixed(1)}%` : '—'),
             icon: <ShieldCheck size={14} />,
-            color: 'text-slate-700',
+            color: 'text-indigo-600',
             iconBg: 'bg-indigo-50 text-indigo-500',
-        },
-        {
-            label: 'Analysis Target',
-            value: stock || '—',
-            icon: <BarChart3 size={14} />,
-            color: 'text-slate-900',
-            iconBg: 'bg-slate-50 text-slate-400',
         }
     ];
 
@@ -335,7 +335,7 @@ const Prediction = () => {
                             className={`relative z-30 w-full lg:w-auto px-10 py-4 h-[72px] rounded-[1.8rem] font-black text-[11px] md:text-[12px] uppercase tracking-[0.2em] flex items-center justify-center gap-3 transition-all gsap-hero-el border ${loading || !stock ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed opacity-80' : 'bg-slate-900 text-white border-white/10 hover:bg-black shadow-xl shadow-slate-200/50'}`}
                         >
                             <RefreshCcw size={18} className={loading ? 'animate-spin' : ''} />
-                            {loading ? 'Processing Node...' : 'Execute Analysis'}
+                            {loading ? 'Refreshing AI Node...' : 'Execute Analysis'}
                         </button>
                     </div>
                 </header>
@@ -399,7 +399,9 @@ const Prediction = () => {
                                             <div className="w-16 h-16 border-4 border-slate-100 border-t-emerald-500 rounded-full animate-spin" />
                                             <Activity size={24} className="absolute inset-0 m-auto text-emerald-500" />
                                         </div>
-                                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.4em] animate-pulse">Computing Matrix...</p>
+                                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] animate-pulse text-center">
+                                            Fetching latest market data <br /> and updating AI model...
+                                        </p>
                                     </motion.div>
                                 ) : result ? (
                                     <motion.div key="result" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 flex flex-col">
@@ -417,7 +419,9 @@ const Prediction = () => {
                                             </div>
                                             <div>
                                                 <p className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Cluster Confidence</p>
-                                                <p className="text-xl md:text-2xl font-bold text-slate-700">±{(result.threshold * 100).toFixed(1)}%</p>
+                                                <p className="text-xl md:text-2xl font-bold text-slate-700">
+                                                    {result.confidence ? `${result.confidence}%` : `±${(result.threshold * 100).toFixed(1)}%`}
+                                                </p>
                                             </div>
                                         </div>
                                     </motion.div>

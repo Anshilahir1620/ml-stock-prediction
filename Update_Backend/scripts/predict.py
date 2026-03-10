@@ -62,6 +62,7 @@ def predict_stock(stock):
         "current_price": round(current_price, 2),
         "predicted_return": round(float(proba), 4),
         "signal": signal,
-        "threshold": threshold
+        "threshold": threshold,
+        "confidence": round(abs(proba - threshold) * 2 * 100, 2)
     }
 
