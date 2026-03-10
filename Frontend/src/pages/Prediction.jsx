@@ -298,7 +298,10 @@ const Prediction = () => {
                                                 Available Assets
                                             </p>
                                         </div>
-                                        <div className="max-h-[350px] overflow-y-auto px-3 custom-scrollbar">
+                                        <div 
+                                            className="max-h-[320px] overflow-y-auto px-4 custom-scrollbar" 
+                                            data-lenis-prevent
+                                        >
                                             {supportedStocks.map((ticker) => (
                                                 <button
                                                     key={ticker}
@@ -610,17 +613,21 @@ const Prediction = () => {
             <style dangerouslySetInnerHTML={{
                 __html: `
                 .custom-scrollbar::-webkit-scrollbar {
-                    width: 4px;
+                    width: 5px;
                 }
                 .custom-scrollbar::-webkit-scrollbar-track {
                     background: transparent;
                 }
                 .custom-scrollbar::-webkit-scrollbar-thumb {
-                    background: #f1f5f9;
-                    border-radius: 10px;
+                    background: rgba(0, 0, 0, 0.05);
+                    border-radius: 100px;
+                    border: 1px solid transparent;
                 }
                 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                    background: #e2e8f0;
+                    background: rgba(0, 0, 0, 0.1);
+                }
+                .custom-scrollbar {
+                    scrollbar-gutter: stable;
                 }
             `}} />
         </div >
