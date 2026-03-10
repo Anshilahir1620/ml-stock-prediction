@@ -10,7 +10,6 @@ const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const location = useLocation();
 
-    // Mapping existing routes to requested professional names
     const navItems = [
         { name: 'Home', path: '/', icon: <Home size={22} /> },
         { name: 'Project Workflow', path: '/how-it-works', icon: <GitBranch size={22} /> },
@@ -20,16 +19,13 @@ const Navbar = () => {
         { name: 'Contact', path: 'mailto:anshilchotara@gmail.com', icon: <MessageSquare size={22} />, isExternal: true },
     ];
 
-    // Close menu on route change
     useEffect(() => {
         setIsOpen(false);
     }, [location]);
 
-    // Prevent scrolling when menu is open
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';
-            // Optional: prevent scroll jump for better UX
             const scrollWidth = window.innerWidth - document.documentElement.clientWidth;
             document.body.style.paddingRight = `${scrollWidth}px`;
         } else {
@@ -44,7 +40,6 @@ const Navbar = () => {
 
     return (
         <nav className="fixed top-0 left-0 right-0 z-[1000] bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100 px-6 md:px-24 py-4 flex justify-between items-center h-20">
-            {/* Logo */}
             <NavLink to="/" className="flex items-center gap-3 font-bold text-lg tracking-tight text-gray-900 z-[110]">
                 <div className="bg-gray-900 p-1.5 rounded-lg shadow-lg">
                     <TrendingUp size={18} className="text-white" />
@@ -52,7 +47,6 @@ const Navbar = () => {
                 <span className="uppercase text-[15px] font-black tracking-tighter">Stockton <span className="text-gray-400 font-medium">Hub</span></span>
             </NavLink>
 
-            {/* Desktop Navigation (Hidden on Mobile) */}
             <div className="hidden md:flex items-center gap-10">
                 {navItems.filter(item => ['Home', 'Project Workflow', 'AI Analytics', 'Prediction / Models', 'About'].includes(item.name)).map((item) => (
                     <NavLink
@@ -68,7 +62,6 @@ const Navbar = () => {
                 ))}
             </div>
 
-            {/* Mobile Toggle Button (Visible only on <= 768px) */}
             <div className="flex items-center gap-4">
                 <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest hidden lg:block bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">Live Terminal</span>
 
@@ -81,7 +74,6 @@ const Navbar = () => {
                 </button>
             </div>
 
-            {/* 100% Full-Screen Mobile Overlay Menu */}
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
@@ -93,15 +85,12 @@ const Navbar = () => {
                         style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh' }}
                         onClick={() => setIsOpen(false)}
                     >
-                        {/* THE GRID Background Overlay */}
                         <div className="fixed inset-0 opacity-[0.05] pointer-events-none"
                             style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
 
-                        {/* Soft Glow Accents */}
                         <div className="fixed top-[-20%] right-[-20%] w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[120px]" />
                         <div className="fixed bottom-[-20%] left-[-20%] w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-[140px]" />
 
-                        {/* Top Header Section (Fixed inside Scrollable Overlay) */}
                         <div className="sticky top-0 left-0 right-0 p-8 flex justify-between items-center w-full z-[10000] bg-[#0a0a0a]/80 backdrop-blur-md">
                             <div className="flex items-center gap-3">
                                 <div className="bg-emerald-500 p-1.5 rounded-lg shadow-[0_0_20px_rgba(16,185,129,0.3)]">
@@ -119,7 +108,6 @@ const Navbar = () => {
                             </button>
                         </div>
 
-                        {/* Centered Navigation Links with Scroll Padding */}
                         <div
                             className="relative z-[50] flex flex-col items-center px-8 pt-8 pb-32 min-h-[calc(100vh-100px)]"
                             onClick={(e) => e.stopPropagation()}
@@ -184,7 +172,6 @@ const Navbar = () => {
                                 })}
                             </div>
 
-                            {/* Bottom Status Info */}
                             <div className="text-center w-full flex flex-col items-center gap-6 mt-16 pb-12">
                                 <div className="h-[1px] w-24 bg-white/10" />
                                 <div className="flex items-center gap-4 bg-emerald-500/10 px-6 py-3 rounded-full border border-emerald-500/20">

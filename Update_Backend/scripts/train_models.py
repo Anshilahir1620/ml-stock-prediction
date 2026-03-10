@@ -24,7 +24,6 @@ def train_model(stock):
         
     df = pd.read_csv(file_path)
     
-    # Drop rows where target is missing (the latest row)
     df = df.dropna(subset=["Tomorrow_Return"])
     
     if len(df) < 50:

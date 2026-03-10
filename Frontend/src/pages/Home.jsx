@@ -20,7 +20,6 @@ const Home = () => {
 
     useEffect(() => {
         const ctx = gsap.context(() => {
-            // Hero Entrance
             gsap.from(".hero-element", {
                 y: 50,
                 filter: "blur(10px)",
@@ -30,7 +29,6 @@ const Home = () => {
                 ease: "power4.out"
             });
 
-            // Parallax Hero Background
             gsap.to(parallaxBgRef.current, {
                 yPercent: 20,
                 ease: "none",
@@ -42,7 +40,6 @@ const Home = () => {
                 }
             });
 
-            // Section Progressive Reveal
             gsap.utils.toArray("section").forEach((section, i) => {
                 if (i === 0) return;
                 gsap.from(section, {
@@ -60,7 +57,6 @@ const Home = () => {
                 });
             });
 
-            // "The Synthesis" DNA/Nodes Animation
             gsap.to(".synthesis-node", {
                 y: "random(-40, 40)",
                 x: "random(-20, 20)",
@@ -70,7 +66,6 @@ const Home = () => {
                 ease: "sine.inOut"
             });
 
-            // Full Width Image Parallax
             gsap.fromTo(".full-width-img",
                 { scale: 1.3, yPercent: -15 },
                 {
@@ -86,7 +81,6 @@ const Home = () => {
                 }
             );
 
-            // Skew on Scroll for Feature Cards
             let proxy = { skew: 0 },
                 skewSetter = gsap.quickSetter(".feature-card", "skewY", "deg"),
                 clamp = gsap.utils.clamp(-8, 8);
@@ -107,7 +101,6 @@ const Home = () => {
                 }
             });
 
-            // Statistical Numbers Animation
             gsap.from(".stat-num", {
                 scrollTrigger: {
                     trigger: ".stat-num",
@@ -133,7 +126,6 @@ const Home = () => {
                 className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-br from-emerald-500/5 to-transparent rounded-full blur-[100px] -z-10 pointer-events-none"
             />
 
-            {/* ───────── HERO SECTION ───────── */}
             <section className="w-full px-6 md:px-24 text-center mb-16 md:mb-32 min-h-[50vh] md:min-h-[60vh] flex flex-col items-center justify-center relative">
                 <motion.span
                     initial={{ opacity: 0 }}
@@ -163,7 +155,6 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* ───────── SECTION 1: THE SYNTHESIS MECHANISM ───────── */}
             <section className="w-full bg-[#0a0a0a] py-20 md:py-32 relative overflow-hidden text-white border-y border-white/5">
                 <div className="absolute inset-0 opacity-[0.04] pointer-events-none" style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '60px 60px' }}></div>
 
@@ -219,7 +210,6 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* SECTION 2: INSTITUTIONAL PRECISION (STATISTICS) */}
             <section className="py-24 md:py-32 w-full px-6 flex justify-center">
                 <div className="max-w-[1200px] w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-16 md:gap-24 lg:gap-32">
                     {[
@@ -247,8 +237,7 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* ───────── FULL WIDTH IMAGE SECTION ───────── */}
-            <section ref={fullImgRef} className="w-full h-[50vh] md:h-[65vh] overflow-hidden relative border-y border-gray-100 bg-black text-center">
+            <section className="w-full h-[50vh] md:h-[65vh] overflow-hidden relative border-y border-gray-100 bg-black text-center">
                 <img
                     src={dashboardImg}
                     alt="Fintech Analysis Preview"
@@ -267,7 +256,6 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* ───────── SECTION 3: RECURSIVE LAYERS ───────── */}
             <section className="w-full bg-[#fbfbf9] py-20 md:py-32 border-t border-gray-100 mb-0">
                 <div className="w-full px-6 md:px-24 text-center md:text-left">
                     <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-12 md:mb-24 gap-10">

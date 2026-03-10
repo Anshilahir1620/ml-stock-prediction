@@ -36,13 +36,12 @@ const Prediction = () => {
     const mainGridRef = useRef(null);
     const intelligenceRef = useRef(null);
 
-    // ─── PREDICT with CACHE / SWR ───
     const handlePredict = async (ticker = stock) => {
         const symbolToPredict = ticker || stock;
         if (!symbolToPredict) return;
 
         const startTime = Date.now();
-        setIsLoading(true); // Triggers satisfying global loader
+        setIsLoading(true);
 
         const cached = getPrediction(symbolToPredict);
         if (cached) {
@@ -60,7 +59,6 @@ const Prediction = () => {
             if (freshData) {
                 setResult(freshData);
                 
-                // GSAP Draw-in for the chart
                 setTimeout(() => {
                     const path = pathRef.current;
                     if (path && typeof path.getTotalLength === 'function') {
@@ -77,7 +75,7 @@ const Prediction = () => {
         } catch (err) {
             if (!cached) setError('Prediction failed.');
         } finally {
-            const minDuration = 2100; // 2.1 seconds for satisfying AI experience
+            const minDuration = 2100;
             const elapsed = Date.now() - startTime;
             const remaining = Math.max(0, minDuration - elapsed);
 
@@ -89,11 +87,9 @@ const Prediction = () => {
         }
     };
 
-    // ─── FETCH SUPPORTED STOCKS ON MOUNT ───
     useEffect(() => {
         const fetchStocks = async () => {
             setStocksLoading(true);
-            // We don't need setIsLoading(true) here as it's handled by handlePredict
             try {
                 const response = await axios.get(`${API_BASE}/`);
                 if (response.data.supported_stocks && Array.isArray(response.data.supported_stocks)) {
@@ -109,7 +105,6 @@ const Prediction = () => {
                 setError('Could not connect to backend.');
             } finally {
                 setStocksLoading(false);
-                // Note: setIsLoading(false) is handled by handlePredict which is called above
             }
         };
         fetchStocks();
@@ -121,10 +116,8 @@ const Prediction = () => {
         handlePredict(ticker);
     };
 
-    // ─── GSAP PREMIUM ANIMATIONS ───
     useEffect(() => {
         const ctx = gsap.context(() => {
-            // Initial Page Load staggered entrance
             const tl = gsap.timeline();
 
             tl.from(".gsap-hero-el", {
@@ -149,7 +142,6 @@ const Prediction = () => {
                     ease: "power3.out"
                 }, "-=0.3");
 
-            // Scroll Reveals
             gsap.from(".reveal-section", {
                 y: 30,
                 opacity: 0,
@@ -163,7 +155,6 @@ const Prediction = () => {
                 }
             });
 
-            // Subtle Background Motion
             gsap.to(".system-grid", {
                 yPercent: -5,
                 ease: "none",
@@ -178,7 +169,6 @@ const Prediction = () => {
         return () => ctx.revert();
     }, []);
 
-    // ─── CLICK OUTSIDE DROPDOWN ───
     useEffect(() => {
         const handleClickOutside = (e) => {
             if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -226,7 +216,6 @@ const Prediction = () => {
         }
     ];
 
-    // Card hover animation (GSAP)
     const onCardHover = (e) => {
         gsap.to(e.currentTarget, {
             y: -4,
@@ -249,17 +238,14 @@ const Prediction = () => {
 
     return (
         <div ref={containerRef} className="w-full pt-10 pb-10 px-4 md:px-12 lg:px-24 bg-[#FCFCFD] overflow-x-hidden relative min-h-screen">
-            {/* FINE SUBTLE GRID */}
             <div className="system-grid absolute inset-0 opacity-[0.03] pointer-events-none -z-10"
                 style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
 
-            {/* SOFT ACCENTS */}
             <div className="absolute top-[-5%] right-[-5%] w-[600px] h-[600px] bg-slate-200/20 rounded-full blur-[120px] -z-20" />
             <div className="absolute bottom-[-10%] left-[-5%] w-[800px] h-[800px] bg-slate-100/30 rounded-full blur-[140px] -z-20" />
 
             <div className="max-w-[1300px] mx-auto relative z-10 w-full">
 
-                {/* ───────── HEADER (REFINED HERO) ───────── */}
                 <header ref={heroRef} className="relative z-50 mb-10 md:mb-14 flex flex-col md:flex-row md:items-end justify-between gap-8 md:gap-10">
                     <div className="text-center md:text-left">
                         <div className="gsap-hero-el flex items-center justify-center md:justify-start gap-2 mb-4">
@@ -274,7 +260,6 @@ const Prediction = () => {
                     </div>
 
                     <div className="flex flex-col lg:flex-row items-center gap-4 w-full lg:w-auto mb-4 md:mb-0">
-                        {/* REFINED DROPDOWN */}
                         <div className="relative w-full lg:w-[320px] gsap-hero-el" ref={dropdownRef} style={{ zIndex: isDropdownOpen ? 200 : 40 }}>
                             <motion.button
                                 whileHover={{ y: -2 }}
@@ -283,7 +268,6 @@ const Prediction = () => {
                                 disabled={stocksLoading}
                                 className={`group relative w-full bg-white backdrop-blur-xl border ${isDropdownOpen ? 'border-slate-900 shadow-xl' : 'border-slate-200/80'} px-6 py-4 rounded-[1.8rem] flex items-center gap-4 transition-all duration-500 disabled:opacity-50 overflow-hidden shadow-sm h-[72px]`}
                             >
-                                {/* SUBTLE GLOW OVERLAY */}
                                 <div className="absolute inset-0 bg-gradient-to-tr from-slate-50/0 via-slate-50/5 to-white/30 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                                 <div className={`p-3 rounded-2xl transition-all duration-500 shrink-0 ${isDropdownOpen ? 'bg-slate-900 text-white shadow-[0_8px_20px_rgba(0,0,0,0.15)]' : 'bg-slate-50 text-slate-400 group-hover:bg-slate-100 group-hover:text-slate-600'}`}>
@@ -365,7 +349,6 @@ const Prediction = () => {
                     </div>
                 </header>
 
-                {/* ───────── ERROR STATE ───────── */}
                 <AnimatePresence>
                     {error && (
                         <motion.div
@@ -379,7 +362,6 @@ const Prediction = () => {
                     )}
                 </AnimatePresence>
 
-                {/* ───────── TOP METRICS GRID ───────── */}
                 <div ref={cardsContainerRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
                     {metrics.map((m, idx) => (
                         <div
@@ -401,10 +383,8 @@ const Prediction = () => {
                     ))}
                 </div>
 
-                {/* ───────── MAIN CONTENT GRID ───────── */}
                 <div ref={mainGridRef} className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch mb-16">
 
-                    {/* LEFT: SIGNAL FOCUS */}
                     <div className="lg:col-span-4 flex flex-col gap-8 gsap-main-grid-el">
                         <div className="bg-white border border-slate-100 p-8 rounded-[2.5rem] shadow-sm relative overflow-hidden flex-1 flex flex-col">
                             <div className="flex items-center justify-between mb-8">
@@ -483,7 +463,6 @@ const Prediction = () => {
                         </div>
                     </div>
 
-                    {/* RIGHT: CHART & VISUALIZATION */}
                     <div className="lg:col-span-8 gsap-main-grid-el">
                         <div className="bg-white border border-slate-100 p-10 rounded-[2.5rem] shadow-sm flex flex-col h-full min-h-[520px]">
                             <div className="mb-12 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6">
@@ -499,7 +478,6 @@ const Prediction = () => {
 
                             <div className="flex-1 w-full relative group">
                                 <div className="flex h-full pb-10">
-                                    {/* AXIS LABELS */}
                                     <div className="hidden sm:flex w-[120px] flex-col justify-between text-[10px] text-slate-300 font-bold py-6 pr-8 text-right uppercase tracking-widest leading-none border-r border-slate-50">
                                         <span className="text-emerald-500/60">Expansion</span>
                                         <span>Momentum</span>
@@ -508,7 +486,6 @@ const Prediction = () => {
                                         <span className="text-rose-500/60">Contraction</span>
                                     </div>
 
-                                    {/* CHART CANVAS */}
                                     <div
                                         className="flex-1 relative cursor-crosshair ml-4 sm:ml-8"
                                         onMouseMove={(e) => {
@@ -519,20 +496,13 @@ const Prediction = () => {
                                         }}
                                         onMouseLeave={() => setHoveredData(null)}
                                     >
-                                        {/* GRID LINES */}
                                         <div className="absolute inset-0 flex flex-col justify-between py-6 pointer-events-none opacity-40">
                                             {[...Array(5)].map((_, i) => (
                                                 <div key={i} className="w-full border-t border-slate-100 h-0"></div>
                                             ))}
                                         </div>
 
-                                        {/* SVG LINE */}
                                         <svg className="absolute inset-0 w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 100 50">
-                                            {/* Gradient for area beneath */}
-
-
-
-
                                             <motion.path
                                                 ref={pathRef}
                                                 initial={{ d: "M0,25 L10,24 L20,26 L30,24 L40,25 L50,23 L60,27 L70,25 L80,24 L90,26 L100,25" }}
@@ -558,7 +528,6 @@ const Prediction = () => {
                                             )}
                                         </svg>
 
-                                        {/* TOOLTIP */}
                                         <AnimatePresence>
                                             {hoveredData && (
                                                 <motion.div
@@ -586,9 +555,6 @@ const Prediction = () => {
                     </div>
                 </div>
 
-
-
-                {/* ───────── SYSTEM INTELLIGENCE OVERVIEW (NEW SECTION) ───────── */}
                 <section ref={intelligenceRef} className="reveal-section border-t border-slate-100 pt-16">
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
                         <div>
@@ -643,11 +609,8 @@ const Prediction = () => {
                     </div>
                 </section>
             </div>
-
-            {/* NO LOCAL STYLES NEEDED - HANDLED BY INDEX.CSS */}
         </div >
     );
 };
 
 export default Prediction;
-

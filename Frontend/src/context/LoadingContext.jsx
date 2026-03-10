@@ -10,12 +10,11 @@ export const LoadingProvider = ({ children }) => {
     const [isLoading, setIsLoading] = useState(false);
     const location = useLocation();
 
-    // Trigger loader on route change
     useEffect(() => {
         setIsLoading(true);
         const timer = setTimeout(() => {
             setIsLoading(false);
-        }, 800); // Minimum animation time for smoother transition
+        }, 800);
         return () => clearTimeout(timer);
     }, [location.pathname]);
 

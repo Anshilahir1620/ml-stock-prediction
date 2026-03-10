@@ -12,11 +12,9 @@ from typing import List
 
 app = FastAPI()
 
-# Configuration
 SUPPORTED_STOCKS = ["RELIANCE", "TCS", "ADANI", "GOLD", "SILVER", "SUZLON"]
 IST = pytz.timezone('Asia/Kolkata')
 
-# In-memory cache for last refresh time per stock
 last_refresh = {}
 
 app.add_middleware(
@@ -38,32 +36,25 @@ def refresh_if_needed(stock: str):
     should_refresh = False
     
     if not last:
-        # Never refreshed in this session
         should_refresh = True
     else:
-        # Check if it was a different day
         if now.date() != last.date():
             should_refresh = True
         else:
-            # Same day: Check market hours (9:30 AM - 3:30 PM IST)
             market_start = now.replace(hour=9, minute=30, second=0, microsecond=0)
             market_end = now.replace(hour=15, minute=30, second=0, microsecond=0)
             
             if market_start <= now <= market_end:
-                # If market is open, refresh if last refresh was more than 15 mins ago
                 if (now - last).total_seconds() > 900:
                     should_refresh = True
             elif now > market_end and last < market_end:
-                # Final refresh after market close to get the end-of-day data
                 should_refresh = True
 
     if should_refresh:
         print(f"Refreshing data and model for {stock} at {now} IST...")
         try:
-            # Fetch latest data
             updated = update_stock_data(stock)
             if updated:
-                # Retrain model with new data
                 train_model(stock)
             last_refresh[stock] = now
             return True
@@ -86,7 +77,6 @@ def post_prediction(request: StockRequest):
     if stock not in SUPPORTED_STOCKS:
         raise HTTPException(status_code=404, detail=f"Stock {stock} not supported. Try {SUPPORTED_STOCKS}")
     
-    # Trigger smart refresh/retrain before predicting
     refresh_if_needed(stock)
     
     try:
@@ -128,22 +118,15 @@ def get_historical(stock: str):
     
     try:
         df = pd.read_csv(csv_path)
-        # Select last 100 entries for meaningful visualization
-        # We need Daily_Return, Gap, High_Low_Range for the scatter plot
-        # We'll use Tomorrow_Return to determine signal (BUY/SELL)
         df_viz = df.tail(101).copy()
         
-        # Calculate features requested by user for 3D plots
         df_viz["Prev_Return"] = df_viz["Daily_Return"].shift(1)
         df_viz["Volatility"] = df_viz["High_Low_Range"]
         
-        # Drop the first row which will have NaN for Prev_Return, but we fetch 101 to keep 100
         df_viz = df_viz.iloc[1:].copy()
         
-        # Clean for JSON (handle NaN if any)
         df_viz = df_viz.fillna(0)
         
-        # Signal logic: if tomorrow return > 0, it's a BUY day (green), else SELL (red)
         df_viz["Signal"] = df_viz["Tomorrow_Return"].apply(lambda x: "BUY" if x > 0 else "SELL")
         
         records = df_viz[["Date", "Daily_Return", "Gap", "High_Low_Range", "Signal", "Tomorrow_Return", "Close", "Volatility", "Prev_Return"]].to_dict(orient="records")

@@ -34,7 +34,6 @@ const AIAnalytics = () => {
 
     const supportedStocks = ["RELIANCE", "TCS", "ADANI", "GOLD", "SILVER", "SUZLON"];
 
-    // Handle outside clicks for dropdown
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -45,11 +44,10 @@ const AIAnalytics = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    // Fetch data for the graphs
     useEffect(() => {
         const fetchData = async () => {
             const startTime = Date.now();
-            setIsLoading(true); // Trigger satisfying global loader
+            setIsLoading(true);
 
             const cached = getAnalytics(stock);
             if (cached) {
@@ -71,7 +69,7 @@ const AIAnalytics = () => {
                 console.error("Error fetching analytics data:", err);
                 if (!cached) setError("Failed to load neural data clusters.");
             } finally {
-                const minDuration = 2100; // 2.1 seconds for satisfying AI experience
+                const minDuration = 2100;
                 const elapsed = Date.now() - startTime;
                 const remaining = Math.max(0, minDuration - elapsed);
 
@@ -102,7 +100,6 @@ const AIAnalytics = () => {
         return () => ctx.revert();
     }, []);
 
-    // ───────── 1: FEATURE SYNERGY (3D SCATTER) ─────────
     const scatterData = React.useMemo(() => {
         if (!historicalData || historicalData.length === 0) return [];
         
@@ -147,24 +144,19 @@ const AIAnalytics = () => {
         ];
     }, [historicalData]);
 
-    // ───────── 2: PREDICTION MATRIX (3D SURFACE) ─────────
     const surfaceData = React.useMemo(() => {
         if (!historicalData || historicalData.length < 5) return [];
 
-        // Grid size for the surface
         const size = 25;
         
-        // Extract ranges
         const volMin = Math.min(...historicalData.map(d => d.Volatility));
         const volMax = Math.max(...historicalData.map(d => d.Volatility));
         const trendMin = Math.min(...historicalData.map(d => d.Prev_Return));
         const trendMax = Math.max(...historicalData.map(d => d.Prev_Return));
 
-        // Create axes
         const x_axis = Array.from({length: size}, (_, i) => volMin + (volMax - volMin) * (i / (size - 1)));
         const y_axis = Array.from({length: size}, (_, i) => trendMin + (trendMax - trendMin) * (i / (size - 1)));
 
-        // Populate Z grid using simple IDW (Inverse Distance Weighting) for a smooth surface
         let z_grid = [];
         for (let i = 0; i < size; i++) {
             let row = [];
@@ -172,7 +164,6 @@ const AIAnalytics = () => {
                 const gx = x_axis[i];
                 const gy = y_axis[j];
                 
-                // Simple weighted average based on proximity to actual historical nodes
                 let numerator = 0;
                 let denominator = 0;
                 historicalData.forEach(p => {
@@ -192,9 +183,9 @@ const AIAnalytics = () => {
             y: y_axis,
             type: 'surface',
             colorscale: [
-                [0, '#f43f5e'],   // Bearish (Red)
-                [0.5, '#cbd5e1'], // Neutral (Slate)
-                [1, '#10b981']    // Bullish (Green)
+                [0, '#f43f5e'],
+                [0.5, '#cbd5e1'],
+                [1, '#10b981']
             ],
             showscale: false,
             name: 'Prediction Model Field',
@@ -250,11 +241,9 @@ const AIAnalytics = () => {
 
     return (
         <div ref={containerRef} className="w-full pt-32 pb-48 px-6 md:px-24 bg-[#FCFCFD] overflow-x-hidden relative min-h-screen">
-             {/* BACKGROUND DECORATION */}
              <div className="absolute top-40 right-[-10%] w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-[120px] -z-10 animate-pulse" />
              <div className="absolute bottom-40 left-[-10%] w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-[150px] -z-10" />
 
-             {/* MAIN HEADER */}
              <div className="flex flex-col lg:flex-row items-center justify-between mb-24 gap-12 reveal-analytics relative z-[100] !overflow-visible">
                 <div className="max-w-4xl">
                     <div className="flex flex-wrap items-center gap-4 mb-8">
@@ -284,13 +273,10 @@ const AIAnalytics = () => {
                     </p>
                 </div>
 
-                {/* PREMIUM NEURAL NODE ANIMATION (Right Section) */}
                 <div className="relative w-full lg:w-[450px] h-[350px] flex items-center justify-center group overflow-hidden">
                     <div className="absolute inset-0 bg-emerald-500/5 rounded-full blur-[100px] group-hover:bg-emerald-500/10 transition-colors duration-1000" />
                     
-                    {/* SVG Visualizer */}
                     <svg viewBox="0 0 200 200" className="w-full h-full relative z-10 drop-shadow-2xl">
-                        {/* Orbiting Ring 1 */}
                         <motion.circle 
                             cx="100" cy="100" r="80" 
                             stroke="rgba(16, 185, 129, 0.1)" 
@@ -298,7 +284,6 @@ const AIAnalytics = () => {
                             animate={{ rotate: 360 }}
                             transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
                         />
-                        {/* Orbiting Ring 2 */}
                         <motion.ellipse 
                             cx="100" cy="100" rx="90" ry="40" 
                             stroke="rgba(16, 185, 129, 0.2)" 
@@ -306,7 +291,6 @@ const AIAnalytics = () => {
                             animate={{ rotate: -360 }}
                             transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                         />
-                        {/* Data Particles */}
                         {[...Array(15)].map((_, i) => (
                             <motion.circle
                                 key={i}
@@ -325,7 +309,6 @@ const AIAnalytics = () => {
                                 }}
                             />
                         ))}
-                        {/* Central Node */}
                         <motion.g
                             animate={{ scale: [1, 1.05, 1] }}
                             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
@@ -346,7 +329,6 @@ const AIAnalytics = () => {
                         </motion.g>
                     </svg>
 
-                    {/* Scanning Text Floating */}
                     <div className="absolute top-4 right-4 text-right">
                         <div className="text-[8px] font-black text-emerald-500 uppercase tracking-widest leading-none mb-1">Status</div>
                         <div className="text-[10px] font-black text-gray-900 tracking-tighter uppercase mb-3">Live Synthesis</div>
@@ -363,7 +345,7 @@ const AIAnalytics = () => {
                     </div>
                 </div>
              </div>
-                {/* STOCK SELECTOR */}
+
                 <div className="relative z-[300] max-w-md !overflow-visible" ref={dropdownRef}>
                     <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] mb-4 flex items-center gap-3 italic">
                         <Network size={14} className="text-emerald-500" />
@@ -458,10 +440,8 @@ const AIAnalytics = () => {
                     </motion.div>
                 )}
 
-             {/* GRAPHS GRID */}
              <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16 relative z-0">
                 
-                {/* GRAPH 1: FEATURE SCATTER */}
                 <motion.div 
                     whileHover={{ y: -5 }}
                     className="reveal-analytics bg-white/60 backdrop-blur-xl border border-white/80 p-8 md:p-12 rounded-[3.5rem] shadow-[0_40px_100px_rgba(0,0,0,0.03)] relative overflow-hidden group"
@@ -521,7 +501,6 @@ const AIAnalytics = () => {
                     </div>
                 </motion.div>
 
-                {/* GRAPH 2: MODEL SURFACE */}
                 <motion.div 
                     whileHover={{ y: -5 }}
                     className="reveal-analytics bg-white/60 backdrop-blur-xl border border-white/80 p-8 md:p-12 rounded-[3.5rem] shadow-[0_40px_100px_rgba(0,0,0,0.03)] relative overflow-hidden group"
@@ -578,7 +557,6 @@ const AIAnalytics = () => {
 
              </div>
 
-              {/* INFO SECTION */}
              <div className="mt-20 reveal-analytics bg-gray-900 p-10 md:p-16 rounded-[3rem] text-white relative overflow-hidden shadow-2xl">
                 <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
                 

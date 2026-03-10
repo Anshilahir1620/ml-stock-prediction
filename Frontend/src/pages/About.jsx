@@ -15,7 +15,6 @@ const About = () => {
 
     useEffect(() => {
         const ctx = gsap.context(() => {
-            // Section Reveal
             gsap.from(".reveal-block", {
                 y: 50,
                 opacity: 0,
@@ -29,7 +28,6 @@ const About = () => {
                 }
             });
 
-            // Parallax accents
             gsap.to(".parallax-accent", {
                 yPercent: -20,
                 ease: "none",
@@ -41,7 +39,6 @@ const About = () => {
                 }
             });
 
-            // Developer Section Horizontal Reveal
             const devTl = gsap.timeline({
                 scrollTrigger: {
                     trigger: ".developer-section",
@@ -49,7 +46,6 @@ const About = () => {
                 }
             });
 
-            // Ensure elements are pre-set for animation
             gsap.set(".developer-split-left", { x: -300, opacity: 0, filter: "blur(30px)" });
             gsap.set(".developer-split-right", { x: 300, opacity: 0, filter: "blur(30px)" });
             gsap.set(".developer-icon", { scale: 0, opacity: 0 });
@@ -92,11 +88,9 @@ const About = () => {
     return (
         <div ref={containerRef} className="w-full pt-32 pb-48 px-6 md:px-24 bg-[#fbfbf9] overflow-x-hidden relative min-h-screen">
 
-            {/* BACKGROUND DECORATION */}
             <div className="parallax-accent absolute top-40 right-[-10%] w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-[120px] -z-10" />
             <div className="parallax-accent absolute bottom-40 left-[-10%] w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-[150px] -z-10" />
 
-            {/* ───────── HEADER ───────── */}
             <div className="max-w-4xl mb-16 md:mb-32 reveal-block">
                 <span className="bg-white shadow-sm text-gray-400 px-6 py-2 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-[0.5em] border border-gray-100 mb-6 md:mb-8 inline-block">
                     Terminal Identity v4.2
@@ -109,7 +103,6 @@ const About = () => {
                 </p>
             </div>
 
-            {/* ───────── ABOUT THE PROJECT ───────── */}
             <section className="mb-24 md:mb-48 reveal-block">
                 <div className="flex flex-col md:flex-row gap-10 md:gap-20 items-start">
                     <div className="w-full md:w-1/3">
@@ -130,7 +123,6 @@ const About = () => {
                 </div>
             </section>
 
-            {/* ───────── CORE PHILOSOPHY & TECH STACK ───────── */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 md:gap-32 mb-24 md:mb-48 reveal-block">
                 <div className="space-y-8 md:space-y-12">
                     <div className="p-8 md:p-12 bg-white border border-gray-100 rounded-[2.5rem] md:rounded-[3.5rem] shadow-xl shadow-gray-200/50 relative overflow-hidden group">
@@ -172,7 +164,6 @@ const About = () => {
                 </div>
             </div>
 
-            {/* ───────── ABOUT THE DEVELOPER ───────── */}
             <div className="developer-section w-full bg-gradient-to-br from-gray-900 via-[#062419] to-black rounded-[3rem] md:rounded-[4rem] p-10 md:p-32 text-center text-white relative overflow-hidden shadow-2xl">
                 <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: 'radial-gradient(circle, #10b981 1px, transparent 1px)', backgroundSize: '50px 50px' }} />
 

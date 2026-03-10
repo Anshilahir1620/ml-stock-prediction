@@ -58,24 +58,21 @@ export const DataProvider = ({ children }) => {
         if (isPrefetching) return;
         setIsPrefetching(true);
         
-        // Serialized but background-friendly prefetching
         for (const stock of SUPPORTED_STOCKS) {
             await Promise.allSettled([
                 updatePrediction(stock),
                 updateAnalytics(stock)
             ]);
-            // Subtle delay to prevent backend hammering
             await new Promise(resolve => setTimeout(resolve, 500));
         }
         
         setIsPrefetching(false);
     }, [isPrefetching, updatePrediction, updateAnalytics]);
 
-    // Initial prefetch after mount
     useEffect(() => {
         const timer = setTimeout(() => {
             prefetchAll();
-        }, 2000); // Wait for homepage to settle
+        }, 2000);
         return () => clearTimeout(timer);
     }, []);
 

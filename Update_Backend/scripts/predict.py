@@ -1,18 +1,16 @@
 import pandas as pd
 import joblib
+import os
 
 DATA_FOLDER = "data"
 MODEL_FOLDER = "models"
 
 features = [
-"Daily_Return",
-"Gap",
-"High_Low_Range",
-"Prev_Day_Trend"
+    "Daily_Return",
+    "Gap",
+    "High_Low_Range",
+    "Prev_Day_Trend"
 ]
-
-
-import os
 
 def predict_stock(stock):
     stock = stock.strip().upper()
@@ -20,7 +18,6 @@ def predict_stock(stock):
     csv_path = os.path.join(DATA_FOLDER, f"{stock}.csv")
     model_path = os.path.join(MODEL_FOLDER, f"{stock}_model.pkl")
 
-    # Double check file existence (case-insensitive fallback)
     if not os.path.exists(DATA_FOLDER):
         os.makedirs(DATA_FOLDER)
         
@@ -43,14 +40,12 @@ def predict_stock(stock):
         else:
             raise FileNotFoundError(f"Model file for {stock} not found. Please run the training script.")
 
-
     df = pd.read_csv(csv_path)
     model = joblib.load(model_path)
 
     latest = df.tail(1)
     X = latest[features]
 
-    # Get probability of upward movement
     proba = model.predict_proba(X)[0][1]
     
     threshold = 0.5
@@ -65,4 +60,3 @@ def predict_stock(stock):
         "threshold": threshold,
         "confidence": round(abs(proba - threshold) * 2 * 100, 2)
     }
-

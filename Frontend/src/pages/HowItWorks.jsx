@@ -28,7 +28,6 @@ const HowItWorks = () => {
                 }
             });
 
-            // Parallax effect for images
             gsap.to(".parallax-img", {
                 yPercent: 10,
                 ease: "none",
@@ -40,7 +39,6 @@ const HowItWorks = () => {
                 }
             });
 
-            // Live System Flow Timeline
             const tl = gsap.timeline({
                 scrollTrigger: {
                     trigger: ".flow-section",
@@ -73,7 +71,6 @@ const HowItWorks = () => {
 
     return (
         <div ref={containerRef} className="w-full py-24 px-6 md:px-24 bg-[#fbfbf9] overflow-x-hidden relative">
-            {/* ───────── HEADER ───────── */}
             <div className="text-center mb-16 md:mb-32 content-block">
                 <motion.span
                     initial={{ opacity: 0 }}
@@ -90,7 +87,6 @@ const HowItWorks = () => {
                 </p>
             </div>
 
-            {/* ───────── SECTION 1: ML PIPELINE (3D VIZ) ───────── */}
             <section className="mb-24 md:mb-48 content-block">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
                     <div className="order-2 lg:order-1 relative rounded-[2.5rem] md:rounded-[4rem] overflow-hidden bg-black aspect-[4/3] shadow-2xl border border-gray-100">
@@ -136,7 +132,6 @@ const HowItWorks = () => {
                 </div>
             </section>
 
-            {/* ───────── SECTION 2: RANDOM FOREST (3D VIZ) ───────── */}
             <section className="mb-24 md:mb-48 content-block px-4 md:px-0">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
                     <div className="space-y-8 md:space-y-10 text-center lg:text-left">
@@ -192,7 +187,6 @@ const HowItWorks = () => {
                 </div>
             </section>
 
-            {/* ───────── SECTION 3: LIVE SYSTEM FLOW ───────── */}
             <section className="mb-24 md:mb-48 content-block flow-section px-4 md:px-0">
                 <div className="text-center mb-12 md:mb-16 overflow-hidden">
                     <span className="text-emerald-500 font-black text-[11px] md:text-[12px] uppercase tracking-[0.4em] mb-4 block flow-element">Deployment Architecture</span>
@@ -234,7 +228,6 @@ const HowItWorks = () => {
                 </p>
             </section>
 
-            {/* ───────── EXECUTION LAYER ───────── */}
             <div className="content-block p-10 md:p-20 bg-white border border-gray-100 rounded-[3rem] md:rounded-[4rem] text-center space-y-8 md:space-y-10 shadow-2xl shadow-gray-200/50">
                 <div className="w-16 h-16 md:w-20 md:h-20 bg-gray-50 rounded-[1.5rem] md:rounded-[2rem] flex items-center justify-center mx-auto border border-gray-100">
                     <Binary className="text-gray-900" size={32} />
