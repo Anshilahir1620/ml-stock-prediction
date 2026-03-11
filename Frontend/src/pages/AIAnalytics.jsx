@@ -28,6 +28,7 @@ const AIAnalytics = () => {
     const { getAnalytics, updateAnalytics } = useData();
     const [isRevalidating, setIsRevalidating] = useState(false);
     const [error, setError] = useState(null);
+    const [warning, setWarning] = useState(null);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const containerRef = useRef(null);
     const dropdownRef = useRef(null);
@@ -47,27 +48,47 @@ const AIAnalytics = () => {
     useEffect(() => {
         const fetchData = async () => {
             const startTime = Date.now();
-            setIsLoading(true);
-
             const cached = getAnalytics(stock);
-            if (cached) {
+            const hasValidCache = !!cached;
+
+            if (hasValidCache) {
                 setHistoricalData(cached.data);
                 setIsRevalidating(true);
             } else {
                 setLoading(true);
+                setIsLoading(true);
+            }
+
+            const EXPIRY_TIME = 5 * 60 * 1000; // 5 minutes
+            const now = Date.now();
+            const shouldFetch = !hasValidCache || (now - cached.timestamp > EXPIRY_TIME);
+
+            if (!shouldFetch) {
+                setLoading(false);
+                setIsLoading(false);
+                return;
             }
 
             try {
                 setError(null);
+                setWarning(null);
                 const freshData = await updateAnalytics(stock);
                 if (freshData) {
                     setHistoricalData(freshData);
-                } else if (!cached) {
-                    setError("Data cluster inaccessible.");
+                } else {
+                    if (hasValidCache) {
+                        setWarning('Live data temporarily unavailable. Showing last updated data.');
+                    } else {
+                        setError("Data cluster inaccessible. Please try again later.");
+                    }
                 }
             } catch (err) {
                 console.error("Error fetching analytics data:", err);
-                if (!cached) setError("Failed to load neural data clusters.");
+                if (hasValidCache) {
+                    setWarning('Live data temporarily unavailable. Showing last updated data.');
+                } else {
+                    setError("Failed to load neural data clusters.");
+                }
             } finally {
                 const minDuration = 2100;
                 const elapsed = Date.now() - startTime;
@@ -77,7 +98,8 @@ const AIAnalytics = () => {
                     setLoading(false);
                     setIsLoading(false);
                     setTimeout(() => setIsRevalidating(false), 2000);
-                }, remaining);
+                    setTimeout(() => setWarning(null), 5000);
+                }, hasValidCache ? 0 : remaining);
             }
         };
         fetchData();
@@ -418,27 +440,34 @@ const AIAnalytics = () => {
                     </AnimatePresence>
                 </div>
 
-                {error && (
-                    <motion.div 
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="mt-8 p-6 bg-rose-50 border border-rose-100 rounded-[2rem] flex items-center gap-5"
-                    >
-                        <div className="w-10 h-10 bg-rose-500 rounded-xl flex items-center justify-center text-white">
-                            <AlertCircle size={20} />
-                        </div>
-                        <div>
-                            <p className="text-[12px] font-black text-rose-600 uppercase tracking-tight">Access Protocol Error</p>
-                            <p className="text-[11px] font-bold text-rose-400 uppercase tracking-tight mt-1">{error}</p>
-                        </div>
-                        <button 
-                            onClick={() => setStock(stock)}
-                            className="ml-auto px-6 py-2 bg-white border border-rose-200 rounded-full text-[10px] font-black text-rose-600 uppercase tracking-widest hover:bg-rose-500 hover:text-white transition-all shadow-sm"
+                <AnimatePresence>
+                    {(error || warning) && (
+                        <motion.div 
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            className={`mt-8 p-6 ${error ? 'bg-rose-50 border-rose-100' : 'bg-amber-50 border-amber-100'} border rounded-[2rem] flex items-center gap-5 shadow-sm`}
                         >
-                            Retry Handshake
-                        </button>
-                    </motion.div>
-                )}
+                            <div className={`w-10 h-10 ${error ? 'bg-rose-500' : 'bg-amber-500'} rounded-xl flex items-center justify-center text-white`}>
+                                <AlertCircle size={20} />
+                            </div>
+                            <div>
+                                <p className={`text-[12px] font-black ${error ? 'text-rose-600' : 'text-amber-600'} uppercase tracking-tight`}>
+                                    {error ? 'Access Protocol Error' : 'System Notice'}
+                                </p>
+                                <p className={`text-[11px] font-bold ${error ? 'text-rose-400' : 'text-amber-500'} uppercase tracking-tight mt-1`}>
+                                    {error || warning}
+                                </p>
+                            </div>
+                            <button 
+                                onClick={() => setStock(stock)}
+                                className={`ml-auto px-6 py-2 bg-white border ${error ? 'border-rose-200 text-rose-600 hover:bg-rose-500 hover:text-white' : 'border-amber-200 text-amber-600 hover:bg-amber-500 hover:text-white'} rounded-full text-[10px] font-black uppercase tracking-widest transition-all shadow-sm`}
+                            >
+                                Retry Handshake
+                            </button>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
              <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16 relative z-0">
                 

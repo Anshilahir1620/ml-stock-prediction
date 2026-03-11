@@ -15,12 +15,30 @@ const API_BASE = import.meta.env.VITE_API_URL || 'https://ml-stock-prediction.on
 const SUPPORTED_STOCKS = ["RELIANCE", "TCS", "ADANI", "SUZLON", "GOLD", "SILVER"];
 
 export const DataProvider = ({ children }) => {
-    const [cache, setCache] = useState({ predictions: {}, analytics: {} });
+    const [cache, setCache] = useState(() => {
+        try {
+            const stored = localStorage.getItem('ml_stock_cache');
+            if (stored) {
+                return JSON.parse(stored);
+            }
+        } catch (e) {
+            console.error('Failed to parse cache from localStorage', e);
+        }
+        return { predictions: {}, analytics: {} };
+    });
     const [isPrefetching, setIsPrefetching] = useState(false);
+
+    useEffect(() => {
+        try {
+            localStorage.setItem('ml_stock_cache', JSON.stringify(cache));
+        } catch (e) {
+            console.error('Failed to save cache to localStorage', e);
+        }
+    }, [cache]);
 
     const updatePrediction = useCallback(async (stock) => {
         try {
-            const response = await axios.post(`${API_BASE}/predict`, { stock });
+            const response = await axios.post(`${API_BASE}/predict`, { stock }, { timeout: 6000 });
             setCache(prev => ({
                 ...prev,
                 predictions: {
@@ -37,7 +55,7 @@ export const DataProvider = ({ children }) => {
 
     const updateAnalytics = useCallback(async (stock) => {
         try {
-            const response = await axios.get(`${API_BASE}/historical-data`, { params: { stock } });
+            const response = await axios.get(`${API_BASE}/historical-data`, { params: { stock }, timeout: 6000 });
             if (response.data && response.data.data) {
                 setCache(prev => ({
                     ...prev,

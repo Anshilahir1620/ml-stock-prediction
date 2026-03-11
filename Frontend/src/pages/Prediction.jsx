@@ -25,6 +25,7 @@ const Prediction = () => {
     const { getPrediction, updatePrediction } = useData();
     const [isRevalidating, setIsRevalidating] = useState(false);
     const [error, setError] = useState(null);
+    const [warning, setWarning] = useState(null);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [hoveredData, setHoveredData] = useState(null);
 
@@ -41,18 +42,31 @@ const Prediction = () => {
         if (!symbolToPredict) return;
 
         const startTime = Date.now();
-        setIsLoading(true);
-
         const cached = getPrediction(symbolToPredict);
-        if (cached) {
+        const hasValidCache = !!cached;
+
+        if (hasValidCache) {
             setResult(cached.data);
             setIsRevalidating(true);
         } else {
             setLoading(true);
+            setIsLoading(true);
         }
 
         setError(null);
+        setWarning(null);
         setIsDropdownOpen(false);
+
+        const EXPIRY_TIME = 5 * 60 * 1000; // 5 minutes
+        const now = Date.now();
+        const shouldFetch = !hasValidCache || (now - cached.timestamp > EXPIRY_TIME);
+
+        if (!shouldFetch) {
+            // Cache is still fresh, no need to background refresh yet.
+            setLoading(false);
+            setIsLoading(false);
+            return;
+        }
 
         try {
             const freshData = await updatePrediction(symbolToPredict);
@@ -71,9 +85,19 @@ const Prediction = () => {
                         });
                     }
                 }, 100);
+            } else {
+                if (hasValidCache) {
+                    setWarning('Live data temporarily unavailable. Showing last updated data.');
+                } else {
+                    setError('Live data currently unavailable. Please try again later.');
+                }
             }
         } catch (err) {
-            if (!cached) setError('Prediction failed.');
+            if (hasValidCache) {
+                setWarning('Live data temporarily unavailable. Showing last updated data.');
+            } else {
+                setError('Prediction failed. Please try again later.');
+            }
         } finally {
             const minDuration = 2100;
             const elapsed = Date.now() - startTime;
@@ -82,8 +106,9 @@ const Prediction = () => {
             setTimeout(() => {
                 setLoading(false);
                 setIsLoading(false);
-                setTimeout(() => setIsRevalidating(false), 2000);
-            }, remaining);
+                setTimeout(() => setIsRevalidating(false), 1000);
+                setTimeout(() => setWarning(null), 5000); // clear warning after 5 seconds
+            }, hasValidCache ? 0 : remaining);
         }
     };
 
@@ -350,14 +375,17 @@ const Prediction = () => {
                 </header>
 
                 <AnimatePresence>
-                    {error && (
+                    {(error || warning) && (
                         <motion.div
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0 }}
-                            className="bg-rose-50 border border-rose-100 text-rose-600 p-5 rounded-2xl flex items-center gap-3 text-[13px] font-medium mb-10 shadow-sm"
+                            className={`${error ? 'bg-rose-50 border-rose-100 text-rose-600' : 'bg-amber-50 border-amber-100 text-amber-600'} border p-4 rounded-xl flex items-center justify-between gap-3 text-[13px] font-medium mb-10 shadow-sm`}
                         >
-                            <AlertCircle size={18} /> {error}
+                            <div className="flex items-center gap-3">
+                                <AlertCircle size={18} className="shrink-0" /> 
+                                <span>{error || warning}</span>
+                            </div>
                         </motion.div>
                     )}
                 </AnimatePresence>
